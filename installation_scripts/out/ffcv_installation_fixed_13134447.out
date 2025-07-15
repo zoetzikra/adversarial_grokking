@@ -1,0 +1,69 @@
+✅ FFCV Installation Job (Fixed) started at: Sun Jul 13 20:07:24 CEST 2025
+🔍 Checking available OpenCV easyconfigs...
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.0-foss-2022b-contrib.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-CUDA-12.1.1-contrib.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-contrib.eb
+🔍 Checking available GStreamer easyconfigs...
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GStreamer/GStreamer-1.22.1-GCC-12.2.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GStreamer/GStreamer-1.22.5-GCC-12.3.0.eb
+🔧 Strategy: Install GStreamer dependencies first, then OpenCV...
+Installing GStreamer/1.22.5-GCC-12.3.0...
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-whrchs3r/easybuild-rbvpgcx1.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== GStreamer/1.22.5-GCC-12.3.0 is already installed (module found), skipping
+== No easyconfigs left to be built.
+== Build succeeded for 0 out of 0
+== Temporary log file(s) /scratch-shared/ztzifa/eb-whrchs3r/easybuild-rbvpgcx1.log* have been removed.
+== Temporary directory /scratch-shared/ztzifa/eb-whrchs3r has been removed.
+✅ GStreamer installed successfully
+Installing GST-plugins-base/1.22.5-GCC-12.3.0...
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-x7uw5pyq/easybuild-o5a1_d8n.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== GST-plugins-base/1.22.5-GCC-12.3.0 is already installed (module found), skipping
+== No easyconfigs left to be built.
+== Build succeeded for 0 out of 0
+== Temporary log file(s) /scratch-shared/ztzifa/eb-x7uw5pyq/easybuild-o5a1_d8n.log* have been removed.
+== Temporary directory /scratch-shared/ztzifa/eb-x7uw5pyq has been removed.
+✅ GST-plugins-base installed successfully
+🧹 Cleaning any existing lock files...
+rm: cannot remove '/home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_OpenCV_4.8.1-foss-2023a-CUDA-12.1.1-contrib.lock': Is a directory
+rm: cannot remove '/home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_OpenCV_4.8.1-foss-2023a-contrib.lock': Is a directory
+✅ Lock files cleaned
+🔧 Installing OpenCV (using available easyconfigs)...
+ERROR: Build of /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-CUDA-12.1.1-contrib.eb failed (err: 'build failed (first 300 chars): Lock /home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_OpenCV_4.8.1-foss-2023a-CUDA-12.1.1-contrib.lock already exists, aborting!')
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-rzyvffr0/easybuild-uiokhux5.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== resolving dependencies ...
+== processing EasyBuild easyconfig /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-CUDA-12.1.1-contrib.eb
+== building and installing OpenCV/4.8.1-foss-2023a-CUDA-12.1.1-contrib...
+== FAILED: Installation ended unsuccessfully (build directory: /scratch-shared/ztzifa/OpenCV/4.8.1/foss-2023a-CUDA-12.1.1-contrib): build failed (first 300 chars): Lock /home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_OpenCV_4.8.1-foss-2023a-CUDA-12.1.1-contrib.lock already exists, aborting! (took 0 secs)
+== Results of the build can be found in the log file(s) /scratch-shared/ztzifa/eb-rzyvffr0/easybuild-OpenCV-4.8.1-20250713.200731.nBeyL.log
+⚠️  CUDA OpenCV failed, trying non-CUDA version...
+ERROR: Build of /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-contrib.eb failed (err: 'build failed (first 300 chars): Lock /home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_OpenCV_4.8.1-foss-2023a-contrib.lock already exists, aborting!')
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-hkhgn0ek/easybuild-rhe21pbj.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== resolving dependencies ...
+== processing EasyBuild easyconfig /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-contrib.eb
+== building and installing OpenCV/4.8.1-foss-2023a-contrib...
+== FAILED: Installation ended unsuccessfully (build directory: /scratch-shared/ztzifa/OpenCV/4.8.1/foss-2023a-contrib): build failed (first 300 chars): Lock /home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_OpenCV_4.8.1-foss-2023a-contrib.lock already exists, aborting! (took 0 secs)
+== Results of the build can be found in the log file(s) /scratch-shared/ztzifa/eb-hkhgn0ek/easybuild-OpenCV-4.8.1-20250713.200733.qjsIP.log
+⚠️  Non-CUDA OpenCV failed, trying older version...
+slurmstepd: error: *** JOB 13134447 ON gcn20 CANCELLED AT 2025-07-13T20:10:22 ***
+
+JOB STATISTICS
+==============
+Job ID: 13134447
+Cluster: snellius
+User/Group: ztzifa/ztzifa
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:00:09
+CPU Efficiency: 0.27% of 00:55:48 core-walltime
+Job Wall-clock time: 00:03:06
+Memory Utilized: 2.66 GB
+Memory Efficiency: 6.64% of 40.00 GB (40.00 GB/node)

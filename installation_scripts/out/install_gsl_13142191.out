@@ -1,0 +1,38 @@
+🔧 Installing missing GSL dependency...
+🔍 Checking available GSL easyconfigs...
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.6-GCC-8.3.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.6-GCC-9.3.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.6-GCC-10.2.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.6-iccifort-2019.5.281.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.6-iccifort-2020.1.217.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.6-iccifort-2020.4.304.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.7-GCC-10.3.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.7-GCC-11.2.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.7-GCC-11.3.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GSL/GSL-2.7-GCC-12.2.0.eb
+Installing GSL/2.7-GCC-12.2.0...
+ERROR: Build of /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/b/binutils/binutils-2.39.eb failed (err: 'build failed (first 300 chars): Lock /home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_binutils_2.39.lock already exists, aborting!')
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-5xenrdto/easybuild-vaie6ly7.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== resolving dependencies ...
+== processing EasyBuild easyconfig /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/b/binutils/binutils-2.39.eb
+== building and installing binutils/2.39...
+== FAILED: Installation ended unsuccessfully (build directory: /scratch-shared/ztzifa/binutils/2.39/system-system): build failed (first 300 chars): Lock /home/ztzifa/.local/easybuild/RHEL8/2023/software/.locks/_home_ztzifa_.local_easybuild_RHEL8_2023_software_binutils_2.39.lock already exists, aborting! (took 0 secs)
+== Results of the build can be found in the log file(s) /scratch-shared/ztzifa/eb-5xenrdto/easybuild-binutils-2.39-20250714.124001.wKqhS.log
+⚠️  GSL 2.7 GCC 12.2.0 failed, trying GSL 2.7 GCC 11.3.0...
+slurmstepd: error: *** JOB 13142191 ON gcn6 CANCELLED AT 2025-07-14T13:06:00 ***
+
+JOB STATISTICS
+==============
+Job ID: 13142191
+Cluster: snellius
+User/Group: ztzifa/ztzifa
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:01:44
+CPU Efficiency: 0.37% of 07:51:36 core-walltime
+Job Wall-clock time: 00:26:12
+Memory Utilized: 3.28 GB
+Memory Efficiency: 40.94% of 8.00 GB (8.00 GB/node)

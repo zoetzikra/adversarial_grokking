@@ -1,0 +1,123 @@
+🔧 Complete FFCV compatibility fix...
+============================================================================================== 
+Warning! Mixing Conda and module environments may lead to corruption of the
+user environment. 
+We do not recommend users mixing those two environments unless absolutely
+necessary. Note that 
+SURF does not provide any support for Conda environment.
+For more information, please refer to our software policy page:
+https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
+
+Remember that many packages have already been installed on the system and can
+be loaded using 
+the 'module load <package__name>' command. If you are uncertain if a package is
+already available 
+on the system, please use 'module avail' or 'module spider' to search for it.
+============================================================================================== 
+🔍 Current versions:
+NumPy version: 2.2.6
+OpenCV not available
+🔧 Downgrading NumPy to be compatible with OpenCV 4.8.1...
+Found existing installation: numpy 2.2.6
+Uninstalling numpy-2.2.6:
+  Successfully uninstalled numpy-2.2.6
+Collecting numpy<2.0
+  Downloading numpy-1.26.4.tar.gz (15.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.8/15.8 MB 130.0 MB/s eta 0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): still running...
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: numpy
+  Building wheel for numpy (pyproject.toml): started
+  Building wheel for numpy (pyproject.toml): finished with status 'done'
+  Created wheel for numpy: filename=numpy-1.26.4-cp313-cp313-linux_x86_64.whl size=7758421 sha256=0e31c7edcfa32784bbd924af8da22ff162f8477a993f38bcad2e56405b729051
+  Stored in directory: /gpfs/home6/ztzifa/.cache/pip/wheels/8b/2d/9f/b6b46373f328e2ef50388915d351ccacbedac929459b5459bf
+Successfully built numpy
+Installing collected packages: numpy
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.2.5
+    Uninstalling numpy-2.2.5:
+      Successfully uninstalled numpy-2.2.5
+Successfully installed numpy-1.26.4
+🔧 Installing compatible OpenCV...
+Found existing installation: opencv-python 4.8.1.78
+Uninstalling opencv-python-4.8.1.78:
+  Successfully uninstalled opencv-python-4.8.1.78
+WARNING: Skipping opencv-python-headless as it is not installed.
+Collecting opencv-python==4.8.1.78
+  Using cached opencv_python-4.8.1.78-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+Requirement already satisfied: numpy>=1.21.2 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from opencv-python==4.8.1.78) (1.26.4)
+Using cached opencv_python-4.8.1.78-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (61.7 MB)
+Installing collected packages: opencv-python
+Successfully installed opencv-python-4.8.1.78
+🔧 Reinstalling FFCV...
+WARNING: Skipping ffcv as it is not installed.
+Collecting ffcv
+  Using cached ffcv-1.0.2.tar.gz (2.6 MB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'error'
+  error: subprocess-exited-with-error
+  
+  × python setup.py egg_info did not run successfully.
+  │ exit code: 1
+  ╰─> [26 lines of output]
+      Traceback (most recent call last):
+        File "/gpfs/scratch1/nodespecific/gcn38/ztzifa.13142344/pip-install-g835r56j/ffcv_623ed883c94a459da5fe8e45bf86908e/setup.py", line 93, in <module>
+          extension_kwargs = pkgconfig('opencv4', extension_kwargs)
+        File "/gpfs/scratch1/nodespecific/gcn38/ztzifa.13142344/pip-install-g835r56j/ffcv_623ed883c94a459da5fe8e45bf86908e/setup.py", line 74, in pkgconfig
+          raise RuntimeError(f"Could not find required package: {package}.")
+      RuntimeError: Could not find required package: opencv4.
+      
+      During handling of the above exception, another exception occurred:
+      
+      Traceback (most recent call last):
+        File "<string>", line 2, in <module>
+          exec(compile('''
+          ~~~~^^^^^^^^^^^^
+          # This is <pip-setuptools-caller> -- a caller that pip uses to run setup.py
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ...<32 lines>...
+          exec(compile(setup_py_code, filename, "exec"))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ''' % ('/gpfs/scratch1/nodespecific/gcn38/ztzifa.13142344/pip-install-g835r56j/ffcv_623ed883c94a459da5fe8e45bf86908e/setup.py',), "<pip-setuptools-caller>", "exec"))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "<pip-setuptools-caller>", line 35, in <module>
+        File "/gpfs/scratch1/nodespecific/gcn38/ztzifa.13142344/pip-install-g835r56j/ffcv_623ed883c94a459da5fe8e45bf86908e/setup.py", line 95, in <module>
+          extension_kwargs = pkgconfig('opencv', extension_kwargs)
+        File "/gpfs/scratch1/nodespecific/gcn38/ztzifa.13142344/pip-install-g835r56j/ffcv_623ed883c94a459da5fe8e45bf86908e/setup.py", line 74, in pkgconfig
+          raise RuntimeError(f"Could not find required package: {package}.")
+      RuntimeError: Could not find required package: opencv.
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+🔍 Testing compatibility...
+✅ NumPy 1.26.4 is compatible
+✅ OpenCV 4.8.1 is compatible
+✅ FFCV imported successfully
+✅ Complete FFCV compatibility fix completed!
+
+JOB STATISTICS
+==============
+Job ID: 13142344
+Cluster: snellius
+User/Group: ztzifa/ztzifa
+State: RUNNING
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:29:06 core-walltime
+Job Wall-clock time: 00:01:37
+Memory Utilized: 0.00 MB
+Memory Efficiency: 0.00% of 8.00 GB (8.00 GB/node)
+WARNING: Efficiency statistics can only be obtained after the job has ended as seff tool is based on the accounting database data.

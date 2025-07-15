@@ -1,0 +1,41 @@
+#!/bin/bash
+#SBATCH --partition=gpu_h100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=8
+#SBATCH --job-name=cleanup_easybuild
+#SBATCH --output=cleanup_easybuild_%A.out
+#SBATCH --time=00:30:00
+#SBATCH --mem=40G
+#SBATCH --hint=nomultithread
+
+echo "🧹 EasyBuild Cleanup Job started at: $(date)"
+
+# Load modules
+module purge
+module load 2023
+module load eb/4.9.4
+
+# Set EasyBuild architecture flag
+export EASYBUILD_OPTARCH=''
+
+echo "🔧 Cleaning up EasyBuild lock files and incomplete installations..."
+
+# Remove all EasyBuild lock files
+echo "Removing lock files..."
+rm -rf ~/.local/easybuild/RHEL8/2023/software/.locks/*
+
+# Remove incomplete build directories
+echo "Removing incomplete build directories..."
+rm -rf /scratch-shared/ztzifa/GSTpluginsbad
+rm -rf /scratch-shared/ztzifa/eb-*
+rm -rf /scratch-shared/ztzifa/OpenCV*
+
+# Clean EasyBuild build cache (correct command)
+echo "Cleaning EasyBuild build cache..."
+eb --clean-cache-build
+
+# List what's currently installed (with timeout to avoid hanging)
+echo "📋 Currently installed packages:"
+timeout 60 eb --list-installed || echo "Timeout reached while listing installed packages"
+
+echo "✅ Cleanup completed at: $(date)" 

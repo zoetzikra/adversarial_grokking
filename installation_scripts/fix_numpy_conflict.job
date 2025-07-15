@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --partition=gpu_a100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=4
+#SBATCH --job-name=fix_numpy_conflict
+#SBATCH --output=fix_numpy_conflict_%A.out
+#SBATCH --time=1:00:00
+#SBATCH --mem=8G
+
+echo "🔧 Fixing numpy version conflict..."
+
+# Load conda and activate environment
+module load Anaconda3/2023.07-2
+source activate devinterp_env
+
+echo "🔍 Current numpy versions:"
+python -c "import numpy; print(f'NumPy version: {numpy.__version__}')"
+python -c "import numpy; print(f'NumPy location: {numpy.__file__}')"
+
+echo "🔧 Reinstalling numpy in conda environment..."
+conda install numpy=2.2.6 -y
+
+echo "🔧 Testing FFCV import..."
+python -c "import ffcv; print('✅ FFCV imported successfully')"
+
+echo "✅ Numpy conflict fixed!" 

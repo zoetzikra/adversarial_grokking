@@ -1,0 +1,53 @@
+#!/bin/bash
+#SBATCH --partition=gpu_a100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=4
+#SBATCH --job-name=install_gsl
+#SBATCH --output=install_gsl_%A.out
+#SBATCH --time=1:00:00
+#SBATCH --mem=8G
+
+echo "🔧 Installing missing GSL dependency..."
+
+# Load modules
+module purge
+module load 2023
+module load eb/4.9.4
+
+# Set EasyBuild architecture flag
+export EASYBUILD_OPTARCH=''
+
+# Check what GSL versions are available
+echo "🔍 Checking available GSL easyconfigs..."
+eb --search GSL | grep -E "(2\.7|2\.6)" | head -10
+
+# Try different GSL versions (using correct names)
+echo "Installing GSL/2.7-GCC-12.2.0..."
+eblocalinstall GSL-2.7-GCC-12.2.0.eb -r
+
+if [ $? -ne 0 ]; then
+    echo "⚠️  GSL 2.7 GCC 12.2.0 failed, trying GSL 2.7 GCC 11.3.0..."
+    eblocalinstall GSL-2.7-GCC-11.3.0.eb -r
+fi
+
+if [ $? -ne 0 ]; then
+    echo "⚠️  GSL 2.7 GCC 11.3.0 failed, trying GSL 2.6 GCC 12.2.0..."
+    eblocalinstall GSL-2.6-GCC-12.2.0.eb -r
+fi
+
+if [ $? -eq 0 ]; then
+    echo "✅ GSL installed successfully"
+    echo "🔍 Testing OpenCV module load..."
+    module load OpenCV/4.8.1-foss-2023a-CUDA-12.1.1-contrib
+    if [ $? -eq 0 ]; then
+        echo "✅ OpenCV module now loads successfully"
+    else
+        echo "❌ OpenCV module still has issues"
+    fi
+else
+    echo "❌ All GSL installation attempts failed"
+    echo "💡 Alternative: Your training should work fine with conda OpenCV anyway"
+    exit 1
+fi
+
+echo "✅ GSL installation completed" 

@@ -1,0 +1,171 @@
+#!/bin/bash
+#SBATCH --partition=gpu_a100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=8
+#SBATCH --job-name=ffcv_installation_fixed
+#SBATCH --output=ffcv_installation_fixed_%A.out
+#SBATCH --time=12:00:00
+#SBATCH --mem=40G
+#SBATCH --hint=nomultithread
+
+echo "✅ FFCV Installation Job (Fixed) started at: $(date)"
+
+# Clean environment and load modules
+module purge
+module load 2023
+module load eb/4.9.4
+
+# Set EasyBuild architecture flag as recommended by support team
+export EASYBUILD_OPTARCH=''
+
+echo "🔍 Checking available OpenCV easyconfigs..."
+eb --search OpenCV | grep -E "(4\.8\.1|4\.8\.0)" | head -10
+
+echo "🔍 Checking available GStreamer easyconfigs..."
+eb --search GStreamer | grep -E "(1\.22\.5|1\.22\.)" | head -5
+
+echo "🔧 Strategy: Install GStreamer dependencies first, then OpenCV..."
+
+# Try to install GStreamer dependencies
+echo "Installing GStreamer/1.22.5-GCC-12.3.0..."
+eblocalinstall GStreamer-1.22.5-GCC-12.3.0.eb -r
+
+if [ $? -eq 0 ]; then
+    echo "✅ GStreamer installed successfully"
+    
+    echo "Installing GST-plugins-base/1.22.5-GCC-12.3.0..."
+    eblocalinstall GST-plugins-base-1.22.5-GCC-12.3.0.eb -r
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ GST-plugins-base installed successfully"
+    else
+        echo "⚠️  GST-plugins-base installation failed, but continuing..."
+    fi
+else
+    echo "⚠️  GStreamer installation failed, trying alternative approach..."
+fi
+
+echo "🧹 Cleaning any existing lock files..."
+# Remove any existing lock files that might prevent installation
+rm -rf ~/.local/easybuild/RHEL8/2023/software/.locks/*OpenCV*.lock
+echo "✅ Lock files cleaned"
+
+echo "🔧 Installing OpenCV (using available easyconfigs)..."
+# Try the available OpenCV easyconfigs
+eblocalinstall OpenCV-4.8.1-foss-2023a-CUDA-12.1.1-contrib.eb -r
+
+# If that fails, try the non-CUDA version
+if [ $? -ne 0 ]; then
+    echo "⚠️  CUDA OpenCV failed, trying non-CUDA version..."
+    eblocalinstall OpenCV-4.8.1-foss-2023a-contrib.eb -r
+fi
+
+# If that also fails, try the older version
+if [ $? -ne 0 ]; then
+    echo "⚠️  Non-CUDA OpenCV failed, trying older version..."
+    eblocalinstall OpenCV-4.8.0-foss-2022b-contrib.eb -r
+fi
+
+# Check if any OpenCV installation was successful
+if [ $? -eq 0 ]; then
+    echo "✅ OpenCV installation completed successfully"
+    
+    # Try to load the installed OpenCV (we'll need to find the correct name)
+    echo "🔍 Looking for installed OpenCV modules..."
+    module avail OpenCV 2>&1 | grep -E "(OpenCV|opencv)" | head -10
+    
+    # Try to load OpenCV (adjust the name based on what was actually installed)
+    module load OpenCV/4.8.1-foss-2023a-CUDA-12.1.1-contrib 2>/dev/null || \
+    module load OpenCV/4.8.1-foss-2023a-contrib 2>/dev/null || \
+    module load OpenCV/4.8.0-foss-2022b-contrib 2>/dev/null || \
+    echo "⚠️  Could not load OpenCV module, but installation succeeded"
+    
+    # Verify OpenCV installation
+    echo "🔍 Verifying OpenCV installation..."
+    if pkg-config --modversion opencv4 2>/dev/null; then
+        echo "✅ OpenCV pkg-config working"
+    elif pkg-config --modversion opencv 2>/dev/null; then
+        echo "✅ OpenCV pkg-config working (legacy)"
+    else
+        echo "⚠️  OpenCV pkg-config failed, but continuing..."
+    fi
+    
+    # Load conda and activate environment
+    echo "🔧 Loading conda environment..."
+    module load Anaconda3/2023.07-2
+    source activate devinterp_env
+    
+    echo "🔧 Installing FFCV..."
+    # Install FFCV with verbose output to see any issues
+    python -m pip install --user --no-cache-dir --verbose ffcv
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ FFCV installation completed successfully"
+        
+        # Test FFCV import
+        echo "🔍 Testing FFCV import..."
+        python -c "import ffcv; print('✅ FFCV imported successfully')"
+        
+    else
+        echo "❌ FFCV installation failed"
+        exit 1
+    fi
+    
+else
+    echo "❌ All OpenCV installation attempts failed"
+    echo "🔍 Trying alternative approach: install OpenCV via conda..."
+    
+    # Load conda and activate environment
+    echo "🔧 Loading conda environment..."
+    module load Anaconda3/2023.07-2
+    source activate devinterp_env
+    
+    # Try installing OpenCV via conda instead
+    echo "🔧 Installing OpenCV via conda..."
+    conda install -c conda-forge opencv -y
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ OpenCV installed via conda successfully"
+        
+        echo "🔧 Installing FFCV..."
+        python -m pip install --user --no-cache-dir --verbose ffcv
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ FFCV installation completed successfully"
+            
+            # Test FFCV import
+            echo "🔍 Testing FFCV import..."
+            python -c "import ffcv; print('✅ FFCV imported successfully')"
+            
+        else
+            echo "❌ FFCV installation failed"
+            exit 1
+        fi
+    else
+        echo "❌ Conda OpenCV installation also failed"
+        echo "🔍 Trying pip installation of OpenCV..."
+        
+        # Try installing OpenCV via pip as last resort
+        python -m pip install --user opencv-python
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ OpenCV installed via pip successfully"
+            
+            echo "🔧 Installing FFCV..."
+            python -m pip install --user --no-cache-dir --verbose ffcv
+            
+            if [ $? -eq 0 ]; then
+                echo "✅ FFCV installation completed successfully"
+                python -c "import ffcv; print('✅ FFCV imported successfully')"
+            else
+                echo "❌ FFCV installation failed"
+                exit 1
+            fi
+        else
+            echo "❌ All OpenCV installation methods failed"
+            exit 1
+        fi
+    fi
+fi
+
+echo "✅ Installation job completed at: $(date)" 

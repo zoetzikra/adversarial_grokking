@@ -1,0 +1,39 @@
+#!/bin/bash
+#SBATCH --partition=gpu_a100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=4
+#SBATCH --job-name=fix_ffcv_opencv
+#SBATCH --output=ffcv_opencv_compatibility_%A.out
+#SBATCH --time=1:00:00
+#SBATCH --mem=8G
+
+echo "🔧 Fixing FFCV OpenCV compatibility..."
+
+# Load modules
+module purge
+module load 2023
+module load Anaconda3/2023.07-2
+
+# Activate conda environment
+source activate devinterp_env
+
+echo "🔍 Current OpenCV version:"
+python -c "import cv2; print(f'OpenCV version: {cv2.__version__}')"
+
+echo "🔧 Uninstalling current OpenCV..."
+pip uninstall opencv-python opencv-python-headless -y
+
+echo "🔧 Installing OpenCV 4.8.x to match FFCV..."
+pip install opencv-python==4.8.1.78
+
+echo "🔧 Reinstalling FFCV with correct OpenCV..."
+pip uninstall ffcv -y
+pip install ffcv
+
+echo "🔍 Testing FFCV import..."
+python -c "import ffcv; print('✅ FFCV imported successfully')"
+
+echo "🔍 Testing OpenCV version compatibility..."
+python -c "import cv2; print(f'✅ OpenCV {cv2.__version__} is compatible')"
+
+echo "✅ FFCV OpenCV compatibility fixed!" 

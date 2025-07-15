@@ -1,0 +1,41 @@
+#!/bin/bash
+#SBATCH --partition=gpu_a100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=4
+#SBATCH --job-name=fix_ffcv_complete
+#SBATCH --output=fix_ffcv_compatibility_numpy_downgrade_%A.out
+#SBATCH --time=1:00:00
+#SBATCH --mem=8G
+
+echo "🔧 Complete FFCV compatibility fix..."
+
+# Load modules
+module purge
+module load 2023
+module load Anaconda3/2023.07-2
+
+# Activate conda environment
+source activate devinterp_env
+
+echo "🔍 Current versions:"
+python -c "import numpy; print(f'NumPy version: {numpy.__version__}')"
+python -c "import cv2; print(f'OpenCV version: {cv2.__version__}')" 2>/dev/null || echo "OpenCV not available"
+
+echo "🔧 Downgrading NumPy to be compatible with OpenCV 4.8.1..."
+pip uninstall numpy -y
+pip install "numpy<2.0"
+
+echo "🔧 Installing compatible OpenCV..."
+pip uninstall opencv-python opencv-python-headless -y
+pip install opencv-python==4.8.1.78
+
+echo "🔧 Reinstalling FFCV..."
+pip uninstall ffcv -y
+pip install ffcv
+
+echo "🔍 Testing compatibility..."
+python -c "import numpy; print(f'✅ NumPy {numpy.__version__} is compatible')"
+python -c "import cv2; print(f'✅ OpenCV {cv2.__version__} is compatible')"
+python -c "import ffcv; print('✅ FFCV imported successfully')"
+
+echo "✅ Complete FFCV compatibility fix completed!" 

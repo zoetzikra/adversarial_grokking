@@ -1,0 +1,31 @@
+🔧 Fixing numpy version conflict...
+Lmod has detected the following error: These module(s) or extension(s) exist
+but cannot be loaded as requested: "Anaconda3/2023.07-2"
+   Try: "module spider Anaconda3/2023.07-2" to see how to load the module(s).
+
+
+
+/var/spool/slurm/slurmd/job13140883/slurm_script: line 14: activate: No such file or directory
+🔍 Current numpy versions:
+NumPy version: 1.20.1
+NumPy location: /usr/lib64/python3.9/site-packages/numpy/__init__.py
+🔧 Reinstalling numpy in conda environment...
+/var/spool/slurm/slurmd/job13140883/slurm_script: line 21: conda: command not found
+🔧 Testing FFCV import...f
+✅ FFCV imported successfully
+✅ Numpy conflict fixed!
+
+JOB STATISTICS
+==============
+Job ID: 13140883
+Cluster: snellius
+User/Group: ztzifa/ztzifa
+State: RUNNING
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:03:18 core-walltime
+Job Wall-clock time: 00:00:11
+Memory Utilized: 0.00 MB
+Memory Efficiency: 0.00% of 8.00 GB (8.00 GB/node)
+WARNING: Efficiency statistics can only be obtained after the job has ended as seff tool is based on the accounting database data.

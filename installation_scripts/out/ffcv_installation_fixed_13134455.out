@@ -1,0 +1,364 @@
+✅ FFCV Installation Job (Fixed) started at: Sun Jul 13 20:10:42 CEST 2025
+🔍 Checking available OpenCV easyconfigs...
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.0-foss-2022b-contrib.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-CUDA-12.1.1-contrib.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-contrib.eb
+🔍 Checking available GStreamer easyconfigs...
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GStreamer/GStreamer-1.22.1-GCC-12.2.0.eb
+ * /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/g/GStreamer/GStreamer-1.22.5-GCC-12.3.0.eb
+🔧 Strategy: Install GStreamer dependencies first, then OpenCV...
+Installing GStreamer/1.22.5-GCC-12.3.0...
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-3_dgqem3/easybuild-8nlab2vf.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== GStreamer/1.22.5-GCC-12.3.0 is already installed (module found), skipping
+== No easyconfigs left to be built.
+== Build succeeded for 0 out of 0
+== Temporary log file(s) /scratch-shared/ztzifa/eb-3_dgqem3/easybuild-8nlab2vf.log* have been removed.
+== Temporary directory /scratch-shared/ztzifa/eb-3_dgqem3 has been removed.
+✅ GStreamer installed successfully
+Installing GST-plugins-base/1.22.5-GCC-12.3.0...
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-xrnpwulm/easybuild-0fc9cty3.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== GST-plugins-base/1.22.5-GCC-12.3.0 is already installed (module found), skipping
+== No easyconfigs left to be built.
+== Build succeeded for 0 out of 0
+== Temporary log file(s) /scratch-shared/ztzifa/eb-xrnpwulm/easybuild-0fc9cty3.log* have been removed.
+== Temporary directory /scratch-shared/ztzifa/eb-xrnpwulm has been removed.
+✅ GST-plugins-base installed successfully
+🧹 Cleaning any existing lock files...
+✅ Lock files cleaned
+🔧 Installing OpenCV (using available easyconfigs)...
+== Temporary log file in case of crash /scratch-shared/ztzifa/eb-tpmeev0v/easybuild-64128dko.log
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== found valid index for /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs, so using it...
+== resolving dependencies ...
+== processing EasyBuild easyconfig /sw/noarch/RHEL8/2023/software/EasyBuild/4.9.4/easybuild/easyconfigs/o/OpenCV/OpenCV-4.8.1-foss-2023a-CUDA-12.1.1-contrib.eb
+== building and installing OpenCV/4.8.1-foss-2023a-CUDA-12.1.1-contrib...
+== fetching files...
+== creating build dir, resetting environment...
+== ... (took 24 secs)
+== unpacking...
+== ... (took 7 secs)
+== patching...
+== preparing...
+== ... (took 13 secs)
+== configuring...
+== ... (took 11 mins 33 secs)
+== building...
+== ... (took 2 hours 14 mins 21 secs)
+== testing...
+== installing...
+== ... (took 10 mins 3 secs)
+== taking care of extensions...
+== restore after iterating...
+== postprocessing...
+== sanity checking...
+== ... (took 1 min 46 secs)
+== cleaning up...
+== ... (took 3 secs)
+== creating module...
+== ... (took 4 secs)
+== permissions...
+== packaging...
+== COMPLETED: Installation ended successfully (took 2 hours 38 mins 41 secs)
+== Results of the build can be found in the log file(s) /home/ztzifa/.local/easybuild/RHEL8/2023/software/OpenCV/4.8.1-foss-2023a-CUDA-12.1.1-contrib/easybuild/easybuild-OpenCV-4.8.1-20250713.224932.log
+== Build succeeded for 1 out of 1
+== Temporary log file(s) /scratch-shared/ztzifa/eb-tpmeev0v/easybuild-64128dko.log* have been removed.
+== Temporary directory /scratch-shared/ztzifa/eb-tpmeev0v has been removed.
+✅ OpenCV installation completed successfully
+🔍 Looking for installed OpenCV modules...
+   OpenCV/4.8.1-foss-2023a-CUDA-12.1.1-contrib
+🔍 Verifying OpenCV installation...
+4.8.1
+✅ OpenCV pkg-config working
+🔧 Loading conda environment...
+============================================================================================== 
+Warning! Mixing Conda and module environments may lead to corruption of the
+user environment. 
+We do not recommend users mixing those two environments unless absolutely
+necessary. Note that 
+SURF does not provide any support for Conda environment.
+For more information, please refer to our software policy page:
+https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
+
+Remember that many packages have already been installed on the system and can
+be loaded using 
+the 'module load <package__name>' command. If you are uncertain if a package is
+already available 
+on the system, please use 'module avail' or 'module spider' to search for it.
+============================================================================================== 
+🔧 Installing FFCV...
+Using pip 25.1 from /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/pip (python 3.13)
+Collecting ffcv
+  Downloading ffcv-1.0.2.tar.gz (2.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.6/2.6 MB 11.4 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Running command python setup.py egg_info
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting terminaltables (from ffcv)
+  Obtaining dependency information for terminaltables from https://files.pythonhosted.org/packages/c4/fb/ea621e0a19733e01fe4005d46087d383693c0f4a8f824b47d8d4122c87e0/terminaltables-3.1.10-py2.py3-none-any.whl.metadata
+  Downloading terminaltables-3.1.10-py2.py3-none-any.whl.metadata (3.5 kB)
+Collecting pytorch_pfn_extras (from ffcv)
+  Obtaining dependency information for pytorch_pfn_extras from https://files.pythonhosted.org/packages/8d/8f/fcb364178da4a1f74c8c87bbb97b5117c31472c7a9cb20548368385d7591/pytorch_pfn_extras-0.8.3-py3-none-any.whl.metadata
+  Downloading pytorch_pfn_extras-0.8.3-py3-none-any.whl.metadata (3.0 kB)
+Collecting fastargs (from ffcv)
+  Downloading fastargs-1.2.0.tar.gz (12 kB)
+  Preparing metadata (setup.py): started
+  Running command python setup.py egg_info
+  /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/setuptools/dist.py:447: SetuptoolsDeprecationWarning: Invalid dash-separated options
+  !!
+
+          ********************************************************************************
+          Usage of dash-separated 'description-file' will not be supported in future
+          versions. Please use the underscore name 'description_file' instead.
+
+          This deprecation is overdue, please update your project and remove deprecated
+          calls to avoid build errors in the future.
+
+          See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+          ********************************************************************************
+
+  !!
+    opt = self.warn_dash_deprecation(opt, section)
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: opencv-python in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from ffcv) (4.11.0.86)
+Collecting assertpy (from ffcv)
+  Downloading assertpy-1.1.tar.gz (25 kB)
+  Preparing metadata (setup.py): started
+  Running command python setup.py egg_info
+  /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/setuptools/dist.py:447: SetuptoolsDeprecationWarning: Invalid dash-separated options
+  !!
+
+          ********************************************************************************
+          Usage of dash-separated 'description-file' will not be supported in future
+          versions. Please use the underscore name 'description_file' instead.
+
+          This deprecation is overdue, please update your project and remove deprecated
+          calls to avoid build errors in the future.
+
+          See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+          ********************************************************************************
+
+  !!
+    opt = self.warn_dash_deprecation(opt, section)
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: tqdm in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from ffcv) (4.67.1)
+Requirement already satisfied: psutil in /sw/arch/RHEL8/EB_production/2023/software/Python-bundle-PyPI/2023.06-GCCcore-12.3.0/lib/python3.11/site-packages (from ffcv) (5.9.5)
+Requirement already satisfied: numba in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from ffcv) (0.61.2)
+Requirement already satisfied: llvmlite<0.45,>=0.44.0dev0 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from numba->ffcv) (0.44.0)
+Requirement already satisfied: numpy<2.3,>=1.24 in /sw/arch/RHEL8/EB_production/2023/software/SciPy-bundle/2023.07-gfbf-2023a/lib/python3.11/site-packages (from numba->ffcv) (1.25.1)
+  Link requires a different Python (3.13.2 not in: '>=3.7,<3.11'): https://files.pythonhosted.org/packages/3a/be/650f9c091ef71cb01d735775d554e068752d3ff63d7943b26316dc401749/numpy-1.21.2.zip (from https://pypi.org/simple/numpy/) (requires-python:>=3.7,<3.11)
+  Link requires a different Python (3.13.2 not in: '>=3.7,<3.11'): https://files.pythonhosted.org/packages/5f/d6/ad58ded26556eaeaa8c971e08b6466f17c4ac4d786cd3d800e26ce59cc01/numpy-1.21.3.zip (from https://pypi.org/simple/numpy/) (requires-python:>=3.7,<3.11)
+  Link requires a different Python (3.13.2 not in: '>=3.7,<3.11'): https://files.pythonhosted.org/packages/fb/48/b0708ebd7718a8933f0d3937513ef8ef2f4f04529f1f66ca86d873043921/numpy-1.21.4.zip (from https://pypi.org/simple/numpy/) (requires-python:>=3.7,<3.11)
+  Link requires a different Python (3.13.2 not in: '>=3.7,<3.11'): https://files.pythonhosted.org/packages/c2/a8/a924a09492bdfee8c2ec3094d0a13f2799800b4fdc9c890738aeeb12c72e/numpy-1.21.5.zip (from https://pypi.org/simple/numpy/) (requires-python:>=3.7,<3.11)
+  Link requires a different Python (3.13.2 not in: '>=3.7,<3.11'): https://files.pythonhosted.org/packages/45/b7/de7b8e67f2232c26af57c205aaad29fe17754f793404f59c8a730c7a191a/numpy-1.21.6.zip (from https://pypi.org/simple/numpy/) (requires-python:>=3.7,<3.11)
+  Link requires a different Python (3.13.2 not in: '<3.13,>=3.9'): https://files.pythonhosted.org/packages/55/b3/b13bce39ba82b7398c06d10446f5ffd5c07db39b09bd37370dc720c7951c/numpy-1.26.0.tar.gz (from https://pypi.org/simple/numpy/) (requires-python:<3.13,>=3.9)
+  Link requires a different Python (3.13.2 not in: '<3.13,>=3.9'): https://files.pythonhosted.org/packages/78/23/f78fd8311e0f710fe1d065d50b92ce0057fe877b8ed7fd41b28ad6865bfc/numpy-1.26.1.tar.gz (from https://pypi.org/simple/numpy/) (requires-python:<3.13,>=3.9)
+Collecting numpy<2.3,>=1.24 (from numba->ffcv)
+  Obtaining dependency information for numpy<2.3,>=1.24 from https://files.pythonhosted.org/packages/19/49/4df9123aafa7b539317bf6d342cb6d227e49f7a35b99c287a6109b13dd93/numpy-2.2.6-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
+  Downloading numpy-2.2.6-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
+Requirement already satisfied: packaging in /sw/arch/RHEL8/EB_production/2023/software/Python-bundle-PyPI/2023.06-GCCcore-12.3.0/lib/python3.11/site-packages (from pytorch_pfn_extras->ffcv) (23.1)
+Requirement already satisfied: torch in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from pytorch_pfn_extras->ffcv) (2.7.1)
+Requirement already satisfied: typing-extensions>=3.10 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from pytorch_pfn_extras->ffcv) (4.12.2)
+Requirement already satisfied: filelock in /sw/arch/RHEL8/EB_production/2023/software/Python-bundle-PyPI/2023.06-GCCcore-12.3.0/lib/python3.11/site-packages (from torch->pytorch_pfn_extras->ffcv) (3.12.2)
+Requirement already satisfied: setuptools in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (72.1.0)
+Requirement already satisfied: sympy>=1.13.3 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (1.14.0)
+Requirement already satisfied: networkx in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (3.5)
+Requirement already satisfied: jinja2 in /sw/arch/RHEL8/EB_production/2023/software/Python-bundle-PyPI/2023.06-GCCcore-12.3.0/lib/python3.11/site-packages (from torch->pytorch_pfn_extras->ffcv) (3.1.2)
+Requirement already satisfied: fsspec in /sw/arch/RHEL8/EB_production/2023/software/Python-bundle-PyPI/2023.06-GCCcore-12.3.0/lib/python3.11/site-packages (from torch->pytorch_pfn_extras->ffcv) (2023.6.0)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.6.77 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (12.6.77)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.6.77 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (12.6.77)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.6.80 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (12.6.80)
+Requirement already satisfied: nvidia-cudnn-cu12==9.5.1.17 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (9.5.1.17)
+Requirement already satisfied: nvidia-cublas-cu12==12.6.4.1 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (12.6.4.1)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.0.4 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (11.3.0.4)
+Requirement already satisfied: nvidia-curand-cu12==10.3.7.77 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (10.3.7.77)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.1.2 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (11.7.1.2)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.4.2 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (12.5.4.2)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.6.3 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (0.6.3)
+Requirement already satisfied: nvidia-nccl-cu12==2.26.2 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (2.26.2)
+Requirement already satisfied: nvidia-nvtx-cu12==12.6.77 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (12.6.77)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.6.85 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (12.6.85)
+Requirement already satisfied: nvidia-cufile-cu12==1.11.1.6 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (1.11.1.6)
+Requirement already satisfied: triton==3.3.1 in /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages (from torch->pytorch_pfn_extras->ffcv) (3.3.1)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /sw/arch/RHEL8/EB_production/2023/software/SciPy-bundle/2023.07-gfbf-2023a/lib/python3.11/site-packages (from sympy>=1.13.3->torch->pytorch_pfn_extras->ffcv) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /sw/arch/RHEL8/EB_production/2023/software/Python-bundle-PyPI/2023.06-GCCcore-12.3.0/lib/python3.11/site-packages (from jinja2->torch->pytorch_pfn_extras->ffcv) (2.1.3)
+Downloading numpy-2.2.6-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.5/16.5 MB 196.0 MB/s eta 0:00:00
+Downloading pytorch_pfn_extras-0.8.3-py3-none-any.whl (225 kB)
+Downloading terminaltables-3.1.10-py2.py3-none-any.whl (15 kB)
+Building wheels for collected packages: ffcv, assertpy, fastargs
+  DEPRECATION: Building 'ffcv' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'ffcv'. Discussion can be found at https://github.com/pypa/pip/issues/6334
+  Building wheel for ffcv (setup.py): started
+  Running command python setup.py bdist_wheel
+  ./libffcv/libffcv.cpp: In function 'void my_fread(int64_t, int64_t, void*, int64_t)':
+  ./libffcv/libffcv.cpp:50:14: warning: ignoring return value of 'size_t fread(void*, size_t, size_t, FILE*)' declared with attribute 'warn_unused_result' [-Wunused-result]
+     50 |         fread(destination, 1, size, (FILE *) fp);
+        |         ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+  !!
+
+          ********************************************************************************
+          Please avoid running ``setup.py`` directly.
+          Instead, use pypa/build, pypa/installer or other
+          standards-based tools.
+
+          See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+          ********************************************************************************
+
+  !!
+    self.initialize_options()
+  Building wheel for ffcv (setup.py): finished with status 'done'
+  Created wheel for ffcv: filename=ffcv-1.0.2-cp313-cp313-linux_x86_64.whl size=74086 sha256=c86c61deb76488812a2bc7d94cf160f8c0d178353e8cfcf4ee09e0c20317f471
+  Stored in directory: /gpfs/scratch1/nodespecific/gcn7/ztzifa.13134455/pip-ephem-wheel-cache-ftzpzwez/wheels/6a/f6/20/c4cdcb7e23990ccfd329e57608362053cec3cba3ff6f7784ec
+  DEPRECATION: Building 'assertpy' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'assertpy'. Discussion can be found at https://github.com/pypa/pip/issues/6334
+  Building wheel for assertpy (setup.py): started
+  Running command python setup.py bdist_wheel
+  /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/setuptools/dist.py:447: SetuptoolsDeprecationWarning: Invalid dash-separated options
+  !!
+
+          ********************************************************************************
+          Usage of dash-separated 'description-file' will not be supported in future
+          versions. Please use the underscore name 'description_file' instead.
+
+          This deprecation is overdue, please update your project and remove deprecated
+          calls to avoid build errors in the future.
+
+          See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+          ********************************************************************************
+
+  !!
+    opt = self.warn_dash_deprecation(opt, section)
+  /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+  !!
+
+          ********************************************************************************
+          Please avoid running ``setup.py`` directly.
+          Instead, use pypa/build, pypa/installer or other
+          standards-based tools.
+
+          See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+          ********************************************************************************
+
+  !!
+    self.initialize_options()
+  Building wheel for assertpy (setup.py): finished with status 'done'
+  Created wheel for assertpy: filename=assertpy-1.1-py3-none-any.whl size=42897 sha256=7cd83606f0be4d87a756f251e9b231601d5193cfe1f92dc1d297eae79c84846f
+  Stored in directory: /gpfs/scratch1/nodespecific/gcn7/ztzifa.13134455/pip-ephem-wheel-cache-ftzpzwez/wheels/e9/7b/12/c4dd11e23f8cdb4e8fecf1b087e272836977afbb44936b80be
+  DEPRECATION: Building 'fastargs' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'fastargs'. Discussion can be found at https://github.com/pypa/pip/issues/6334
+  Building wheel for fastargs (setup.py): started
+  Running command python setup.py bdist_wheel
+  /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/setuptools/dist.py:447: SetuptoolsDeprecationWarning: Invalid dash-separated options
+  !!
+
+          ********************************************************************************
+          Usage of dash-separated 'description-file' will not be supported in future
+          versions. Please use the underscore name 'description_file' instead.
+
+          This deprecation is overdue, please update your project and remove deprecated
+          calls to avoid build errors in the future.
+
+          See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+          ********************************************************************************
+
+  !!
+    opt = self.warn_dash_deprecation(opt, section)
+  /home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+  !!
+
+          ********************************************************************************
+          Please avoid running ``setup.py`` directly.
+          Instead, use pypa/build, pypa/installer or other
+          standards-based tools.
+
+          See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+          ********************************************************************************
+
+  !!
+    self.initialize_options()
+  Building wheel for fastargs (setup.py): finished with status 'done'
+  Created wheel for fastargs: filename=fastargs-1.2.0-py3-none-any.whl size=10921 sha256=68fde82a99993000048088411aa6171a9c5e68f7817de520afe8e786c8899c6d
+  Stored in directory: /gpfs/scratch1/nodespecific/gcn7/ztzifa.13134455/pip-ephem-wheel-cache-ftzpzwez/wheels/aa/9d/a0/004167230719b7bc171b164d0f858f320a72fc6b14d31ba10d
+Successfully built ffcv assertpy fastargs
+Installing collected packages: fastargs, assertpy, terminaltables, numpy, pytorch_pfn_extras, ffcv
+  changing mode of /home/ztzifa/.local/bin/f2py to 755
+  changing mode of /home/ztzifa/.local/bin/numpy-config to 755
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+scipy 1.11.1 requires numpy<1.28.0,>=1.21.6, but you have numpy 2.2.6 which is incompatible.
+datasets 3.6.0 requires requests>=2.32.2, but you have requests 2.31.0 which is incompatible.
+devinterp 1.3.2 requires cloudpickle>=3.0.0, but you have cloudpickle 2.2.1 which is incompatible.
+dictionary-learning 0.1.0 requires pandas>=2.2.1, but you have pandas 2.0.3 which is incompatible.
+Successfully installed assertpy-1.1 fastargs-1.2.0 ffcv-1.0.2 numpy-2.2.6 pytorch_pfn_extras-0.8.3 terminaltables-3.1.10
+✅ FFCV installation completed successfully
+🔍 Testing FFCV import...
+Traceback (most recent call last):
+  File "/sw/arch/RHEL8/EB_production/2023/software/SciPy-bundle/2023.07-gfbf-2023a/lib/python3.11/site-packages/numpy/core/__init__.py", line 23, in <module>
+    from . import multiarray
+  File "/sw/arch/RHEL8/EB_production/2023/software/SciPy-bundle/2023.07-gfbf-2023a/lib/python3.11/site-packages/numpy/core/multiarray.py", line 10, in <module>
+    from . import overrides
+  File "/sw/arch/RHEL8/EB_production/2023/software/SciPy-bundle/2023.07-gfbf-2023a/lib/python3.11/site-packages/numpy/core/overrides.py", line 8, in <module>
+    from numpy.core._multiarray_umath import (
+        add_docstring,  _get_implementing_args, _ArrayFunctionDispatcher)
+ModuleNotFoundError: No module named 'numpy.core._multiarray_umath'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ffcv; print('✅ FFCV imported successfully')
+    ^^^^^^^^^^^
+  File "/home/ztzifa/.local/lib/python3.13/site-packages/ffcv/__init__.py", line 1, in <module>
+    from .loader import Loader
+  File "/home/ztzifa/.local/lib/python3.13/site-packages/ffcv/loader/__init__.py", line 1, in <module>
+    from .loader import Loader, OrderOption
+  File "/home/ztzifa/.local/lib/python3.13/site-packages/ffcv/loader/loader.py", line 14, in <module>
+    from ffcv.fields.base import Field
+  File "/home/ztzifa/.local/lib/python3.13/site-packages/ffcv/fields/__init__.py", line 1, in <module>
+    from .base import Field
+  File "/home/ztzifa/.local/lib/python3.13/site-packages/ffcv/fields/base.py", line 3, in <module>
+    import numpy as np
+  File "/sw/arch/RHEL8/EB_production/2023/software/SciPy-bundle/2023.07-gfbf-2023a/lib/python3.11/site-packages/numpy/__init__.py", line 139, in <module>
+    from . import core
+  File "/sw/arch/RHEL8/EB_production/2023/software/SciPy-bundle/2023.07-gfbf-2023a/lib/python3.11/site-packages/numpy/core/__init__.py", line 49, in <module>
+    raise ImportError(msg)
+ImportError: 
+
+IMPORTANT: PLEASE READ THIS FOR ADVICE ON HOW TO SOLVE THIS ISSUE!
+
+Importing the numpy C-extensions failed. This error can happen for
+many reasons, often due to issues with your setup or how NumPy was
+installed.
+
+We have compiled some common reasons and troubleshooting tips at:
+
+    https://numpy.org/devdocs/user/troubleshooting-importerror.html
+
+Please note and check the following:
+
+  * The Python version is: Python3.13 from "/home/ztzifa/.conda/envs/devinterp_env/bin/python"
+  * The NumPy version is: "1.25.1"
+
+and make sure that they are the versions you expect.
+Please carefully study the documentation linked above for further help.
+
+Original error was: No module named 'numpy.core._multiarray_umath'
+
+✅ Installation job completed at: Sun Jul 13 22:50:01 CEST 2025
+
+JOB STATISTICS
+==============
+Job ID: 13134455
+Cluster: snellius
+User/Group: ztzifa/ztzifa
+State: RUNNING
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 1-23:51:00 core-walltime
+Job Wall-clock time: 02:39:30
+Memory Utilized: 0.00 MB
+Memory Efficiency: 0.00% of 40.00 GB (40.00 GB/node)
+WARNING: Efficiency statistics can only be obtained after the job has ended as seff tool is based on the accounting database data.

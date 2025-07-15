@@ -160,7 +160,7 @@ def get_LC_samples(dloader,config):
         if size >= config.approx_n: break
 
     ## concat and keep LC_batch_size
-    samples = torch.concatenate(samples,axis=0)[:config.approx_n]
-    labels = torch.concatenate(labels,axis=0)[:config.approx_n]
+    samples = torch.cat(samples,dim=0)[:config.approx_n]
+    labels = torch.cat(labels,dim=0)[:config.approx_n]
 
     return samples, labels

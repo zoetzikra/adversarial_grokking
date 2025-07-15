@@ -1,0 +1,131 @@
+🔧 Fixing FFCV OpenCV compatibility...
+============================================================================================== 
+Warning! Mixing Conda and module environments may lead to corruption of the
+user environment. 
+We do not recommend users mixing those two environments unless absolutely
+necessary. Note that 
+SURF does not provide any support for Conda environment.
+For more information, please refer to our software policy page:
+https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
+
+Remember that many packages have already been installed on the system and can
+be loaded using 
+the 'module load <package__name>' command. If you are uncertain if a package is
+already available 
+on the system, please use 'module avail' or 'module spider' to search for it.
+============================================================================================== 
+🔍 Current OpenCV version:
+OpenCV version: 4.11.0
+🔧 Uninstalling current OpenCV...
+Found existing installation: opencv-python 4.11.0.86
+Uninstalling opencv-python-4.11.0.86:
+  Successfully uninstalled opencv-python-4.11.0.86
+WARNING: Skipping opencv-python-headless as it is not installed.
+🔧 Installing OpenCV 4.8.x to match FFCV...
+Collecting opencv-python==4.8.1.78
+  Downloading opencv_python-4.8.1.78-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+Requirement already satisfied: numpy>=1.21.2 in /home/ztzifa/.local/lib/python3.13/site-packages (from opencv-python==4.8.1.78) (2.2.6)
+Downloading opencv_python-4.8.1.78-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (61.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.7/61.7 MB 79.3 MB/s eta 0:00:00
+Installing collected packages: opencv-python
+Successfully installed opencv-python-4.8.1.78
+🔧 Reinstalling FFCV with correct OpenCV...
+Found existing installation: ffcv 1.0.2
+Uninstalling ffcv-1.0.2:
+  Successfully uninstalled ffcv-1.0.2
+Collecting ffcv
+  Downloading ffcv-1.0.2.tar.gz (2.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.6/2.6 MB 82.6 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'error'
+  error: subprocess-exited-with-error
+  
+  × python setup.py egg_info did not run successfully.
+  │ exit code: 1
+  ╰─> [26 lines of output]
+      Traceback (most recent call last):
+        File "/gpfs/scratch1/nodespecific/gcn57/ztzifa.13142130/pip-install-xka06c5v/ffcv_9320607068d0447c99f873c92599553a/setup.py", line 93, in <module>
+          extension_kwargs = pkgconfig('opencv4', extension_kwargs)
+        File "/gpfs/scratch1/nodespecific/gcn57/ztzifa.13142130/pip-install-xka06c5v/ffcv_9320607068d0447c99f873c92599553a/setup.py", line 74, in pkgconfig
+          raise RuntimeError(f"Could not find required package: {package}.")
+      RuntimeError: Could not find required package: opencv4.
+      
+      During handling of the above exception, another exception occurred:
+      
+      Traceback (most recent call last):
+        File "<string>", line 2, in <module>
+          exec(compile('''
+          ~~~~^^^^^^^^^^^^
+          # This is <pip-setuptools-caller> -- a caller that pip uses to run setup.py
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ...<32 lines>...
+          exec(compile(setup_py_code, filename, "exec"))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ''' % ('/gpfs/scratch1/nodespecific/gcn57/ztzifa.13142130/pip-install-xka06c5v/ffcv_9320607068d0447c99f873c92599553a/setup.py',), "<pip-setuptools-caller>", "exec"))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "<pip-setuptools-caller>", line 35, in <module>
+        File "/gpfs/scratch1/nodespecific/gcn57/ztzifa.13142130/pip-install-xka06c5v/ffcv_9320607068d0447c99f873c92599553a/setup.py", line 95, in <module>
+          extension_kwargs = pkgconfig('opencv', extension_kwargs)
+        File "/gpfs/scratch1/nodespecific/gcn57/ztzifa.13142130/pip-install-xka06c5v/ffcv_9320607068d0447c99f873c92599553a/setup.py", line 74, in pkgconfig
+          raise RuntimeError(f"Could not find required package: {package}.")
+      RuntimeError: Could not find required package: opencv.
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+🔍 Testing FFCV import...
+✅ FFCV imported successfully
+🔍 Testing OpenCV version compatibility...
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+    import cv2; print(f'✅ OpenCV {cv2.__version__} is compatible')
+  File "/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/cv2/__init__.py", line 181, in <module>
+    bootstrap()
+  File "/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/cv2/__init__.py", line 153, in bootstrap
+    native_module = importlib.import_module("cv2")
+  File "/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+AttributeError: _ARRAY_API not found
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import cv2; print(f'✅ OpenCV {cv2.__version__} is compatible')
+    ^^^^^^^^^^
+  File "/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/cv2/__init__.py", line 181, in <module>
+    bootstrap()
+    ~~~~~~~~~^^
+  File "/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/cv2/__init__.py", line 153, in bootstrap
+    native_module = importlib.import_module("cv2")
+  File "/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ImportError: numpy.core.multiarray failed to import
+✅ FFCV OpenCV compatibility fixed!
+
+JOB STATISTICS
+==============
+Job ID: 13142130
+Cluster: snellius
+User/Group: ztzifa/ztzifa
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:00:06
+CPU Efficiency: 1.96% of 00:05:06 core-walltime
+Job Wall-clock time: 00:00:17
+Memory Utilized: 1.57 MB
+Memory Efficiency: 0.02% of 8.00 GB (8.00 GB/node)
