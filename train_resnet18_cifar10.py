@@ -351,8 +351,8 @@ if __name__ == '__main__':
   timestamp = time.ctime().replace(' ','_')
   config.model_dir = os.path.join(f'./models/{timestamp}')
   config.log_dir = os.path.join(f'./logs/{timestamp}')
-  os.mkdir(config.model_dir)
-  os.mkdir(config.log_dir)
+  os.makedirs(config.model_dir, exist_ok=True)
+  os.makedirs(config.log_dir, exist_ok=True)
 
   if config.wandb_log:
     wandb_project = config.wandb_proj

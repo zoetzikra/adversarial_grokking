@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --job-name=adversarial_grokking_ffcv
 #SBATCH --output=RunMethod_%A_h100_adversarial_grokking_ffcv.out
-#SBATCH --time=04:00:00
+#SBATCH --time=06:00:00
 #SBATCH --mem=40G
 #SBATCH --hint=nomultithread
 
@@ -42,4 +42,5 @@ python -c "import ffcv; print('✅ FFCV is available')" || {
 export WANDB_API_KEY=2877d731558ee6bcd77c08a5e5123cb211aec301
 
 # Run the training script
-python Deep_Networks_Always_Grok_ResNet18_CIFAR10.py 
+# python Deep_Networks_Always_Grok_ResNet18_CIFAR10.py 
+python train_resnet18_cifar10.py 
