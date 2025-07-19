@@ -1,0 +1,102 @@
+✅ Job started at: Sat Jul 19 14:11:05 CEST 2025
+============================================================================================== 
+Warning! Mixing Conda and module environments may lead to corruption of the
+user environment. 
+We do not recommend users mixing those two environments unless absolutely
+necessary. Note that 
+SURF does not provide any support for Conda environment.
+For more information, please refer to our software policy page:
+https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
+
+Remember that many packages have already been installed on the system and can
+be loaded using 
+the 'module load <package__name>' command. If you are uncertain if a package is
+already available 
+on the system, please use 'module avail' or 'module spider' to search for it.
+============================================================================================== 
+🔍 Attempting to load OpenCV...
+⚠️  Could not load OpenCV module, checking Python availability...
+✅ OpenCV 4.8.1 is available via Python
+🔍 Checking FFCV installation...
+✅ FFCV is available
+Calibrating LLC hyperparameters on trained model...
+Starting hyperparameter calibration...
+Using epsilon range: ['1.0e-09', '5.0e-09', '1.0e-08', '5.0e-08', '1.0e-07']
+Using gamma range: [0.1, 0.5, 1.0]
+  0%|          | 0/15 [00:00<?, ?it/s]/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/slt/sampler.py:117: UserWarning: Using passed in nbeta. Make sure callbacks are also initialized with the same nbeta.
+  warnings.warn(
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:240: UserWarning: You are taking more draws than burn-in steps, your LLC estimates will likely be underestimates. Please check LLC chain convergence.
+  warnings.warn(
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:244: UserWarning: You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
+  warnings.warn(
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:285: UserWarning: If you're setting a nbeta or temperature in optimizer_kwargs, please also make sure to set it in the callbacks.
+  warnings.warn(
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:52: UserWarning: You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
+  warnings.warn(
+  7%|▋         | 1/15 [00:04<01:06,  4.78s/it] 13%|█▎        | 2/15 [00:09<00:58,  4.49s/it] 20%|██        | 3/15 [00:13<00:52,  4.39s/it] 27%|██▋       | 4/15 [00:17<00:48,  4.39s/it] 33%|███▎      | 5/15 [00:21<00:43,  4.33s/it] 40%|████      | 6/15 [00:26<00:38,  4.29s/it] 47%|████▋     | 7/15 [00:30<00:34,  4.33s/it] 53%|█████▎    | 8/15 [00:34<00:30,  4.29s/it] 60%|██████    | 9/15 [00:39<00:25,  4.27s/it] 67%|██████▋   | 10/15 [00:43<00:21,  4.26s/it] 73%|███████▎  | 11/15 [00:47<00:17,  4.32s/it] 80%|████████  | 12/15 [00:51<00:12,  4.29s/it] 87%|████████▋ | 13/15 [00:56<00:08,  4.27s/it] 93%|█████████▎| 14/15 [01:00<00:04,  4.26s/it]100%|██████████| 15/15 [01:04<00:00,  4.34s/it]100%|██████████| 15/15 [01:04<00:00,  4.33s/it]
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/slt/sampler.py:117: UserWarning:
+
+Using passed in nbeta. Make sure callbacks are also initialized with the same nbeta.
+
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:240: UserWarning:
+
+You are taking more draws than burn-in steps, your LLC estimates will likely be underestimates. Please check LLC chain convergence.
+
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:244: UserWarning:
+
+You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
+
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:285: UserWarning:
+
+If you're setting a nbeta or temperature in optimizer_kwargs, please also make sure to set it in the callbacks.
+
+/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:52: UserWarning:
+
+You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
+
+Found 15 successful calibration runs
+Best parameters found:
+  ε = 1.00e-07
+  β = 145.990
+  LLC = -15.5175
+  Stability (std/mean) = -2.5151
+
+Top 5 parameter combinations:
+  1. ε=1.00e-07, β=145.990, LLC=-15.5175, stability=-2.5151
+  2. ε=1.00e-07, β=0.462, LLC=-10.2452, stability=-4.5279
+  3. ε=3.16e-08, β=145.990, LLC=-10.1034, stability=-4.7332
+  4. ε=1.00e-07, β=46166.241, LLC=-9.7950, stability=-5.0436
+  5. ε=3.16e-08, β=0.462, LLC=-7.3483, stability=-6.6030
+Calibration plots saved to llc_calibration_results.png
+
+Best parameters from analyzer: {'epsilon': 1e-07, 'beta': 145.99047354364401, 'llc_mean': -15.517453, 'llc_std_over_mean': -2.515075}
+
+=== TESTING BEST PARAMETERS ===
+Testing with: ε=1.00e-07, nβ=145.990, γ=1.00
+Making single test run with best hyperparameters...
+Chain 0:   0%|          | 0/95 [00:00<?, ?it/s]Chain 0:  22%|██▏       | 21/95 [00:00<00:00, 201.55it/s]Chain 0:  44%|████▍     | 42/95 [00:00<00:00, 203.45it/s]Chain 0:  66%|██████▋   | 63/95 [00:00<00:00, 194.88it/s]Chain 0:  87%|████████▋ | 83/95 [00:00<00:00, 190.12it/s]Chain 0: 100%|██████████| 95/95 [00:00<00:00, 191.90it/s]
+Chain 1:   0%|          | 0/95 [00:00<?, ?it/s]Chain 1:  21%|██        | 20/95 [00:00<00:00, 198.53it/s]Chain 1:  43%|████▎     | 41/95 [00:00<00:00, 202.27it/s]Chain 1:  65%|██████▌   | 62/95 [00:00<00:00, 194.54it/s]Chain 1:  86%|████████▋ | 82/95 [00:00<00:00, 189.94it/s]Chain 1: 100%|██████████| 95/95 [00:00<00:00, 191.28it/s]
+Test run result: LLC = nan ± nan
+Plotting LLC trace...
+Trace plot saved to llc_trace_test_run.png
+
+=== RECOMMENDED CONFIG VALUES ===
+Update your config with:
+  llc_epsilon = 1.00e-07
+  llc_gamma = 1.00
+  # Note: nbeta = 145.990 (this goes in optimizer_kwargs)
+Calibration complete. Review plots and update config accordingly.
+
+JOB STATISTICS
+==============
+Job ID: 13220531
+Cluster: snellius
+User/Group: ztzifa/ztzifa
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 16
+CPU Utilized: 00:01:23
+CPU Efficiency: 5.58% of 00:24:48 core-walltime
+Job Wall-clock time: 00:01:33
+Memory Utilized: 1.62 GB
+Memory Efficiency: 4.04% of 40.00 GB (40.00 GB/node)

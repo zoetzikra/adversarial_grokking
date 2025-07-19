@@ -33,7 +33,7 @@ from utils import flatten_model, add_hooks_preact_resnet18
 from attacks import PGD
 from local_complexity import get_intersections_for_hulls
 from samplers import get_ortho_hull_around_samples, get_ortho_hull_around_samples_w_orig
-from configs import config_resnet18_cifar10
+from configs import config_resnet18_cifar10_with_args
 
 #@title Train and evaluation functions
 
@@ -291,7 +291,7 @@ def evaluate_adv(model, dloader, config):
 
 if __name__ == '__main__':
     
-  config = config_resnet18_cifar10()
+  config = config_resnet18_cifar10_with_args()
 
   ## load data
   if not config.use_ffcv:

@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --job-name=adversarial_grokking_ffcv
 #SBATCH --output=RunMethod_%A_h100_adversarial_grokking_ffcv.out
-#SBATCH --time=06:00:00
+#SBATCH --time=12:00:00
 #SBATCH --mem=40G
 #SBATCH --hint=nomultithread
 

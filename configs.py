@@ -49,7 +49,7 @@ def config_resnet18_cifar10():
         config.dmin = 0
     
     
-    config.save_model = False                      # save every model checkpoint
+    config.save_model = True                      # save every model checkpoint
     config.wandb_log = True                        # log using wandb
     config.wandb_proj = 'Grok-Adversarial'
     config.wandb_pref = 'Resnet18-CIFAR10'
@@ -80,11 +80,18 @@ def config_resnet18_cifar10():
     # LLC estimation parameters
     config.compute_LLC_estimate = True
     config.llc_epsilon = 0.03        # SGLD step size (calibrate first)
-    config.llc_gamma = 5.0           # localization parameter
+    config.llc_gamma = 1.0           # localization parameter
     config.llc_num_chains = 2        # number of SGLD chains
     config.llc_num_draws = 500       # samples per chain
     config.llc_num_burnin = 100      # burn-in samples
     config.llc_calibrate = False     # set True for initial calibration
     
-    
+    # Device configuration
+    config.device = 'cuda'           # device for LLC estimation
+
+    return config
+
+def config_resnet18_cifar10_with_args():
+    """Get the default hyperparameter configuration for Resnet18-CIFAR10 training with command-line argument parsing"""
+    config = config_resnet18_cifar10()
     return config_cmdparser(config)
