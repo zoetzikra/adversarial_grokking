@@ -22,11 +22,11 @@ source activate devinterp_env
 echo "Activated Conda environment"
 
 
-python test_mala_calibration.py
+# python test_mala_calibration.py
 
 
 # # Set checkpoint directory (UPDATE THIS PATH)
-# CHECKPOINT_DIR="/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025"
+CHECKPOINT_DIR="/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025"
                 
 
 # # Run hybrid calibration
@@ -34,10 +34,13 @@ python test_mala_calibration.py
 # echo "Checkpoint directory: $CHECKPOINT_DIR"
 # echo "Key checkpoints: 8, 24, 55, 94, 162, 473, 809, 1382, 3088, 9017, 15408, 26327, 58801, 100417, 131331, 224398, 383418, 500000"
 
-# python llc_hybrid_calibration.py \
-#     --checkpoint_dir "$CHECKPOINT_DIR" \
-#     --output_dir "./llc_full_calibration_results" \
-#     --device cuda
+python llc_hybrid_calibration.py \
+    --checkpoint_dir "$CHECKPOINT_DIR" \
+    --output_dir "./llc_full_calibration_results" \
+    --device cuda \
+    --gamma_values 1000 5000 10000 \
+    --use_tuned_beta True
+
 
 echo "Full calibration completed at: $(date)"
 

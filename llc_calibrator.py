@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
 from pathlib import Path
+import copy
 
 # devinterp imports
 from devinterp.optim.sgld import SGLD
@@ -69,7 +70,6 @@ class LLCCalibratorConfig:
     
     # Calibration parameters (expanded ranges per guide)
     calibration_epsilons: List[float] = None
-    calibration_gammas: List[float] = None
     
     # SGLD parameters for calibration runs
     # gamma: float = 10.0  # Default localization strength
@@ -83,9 +83,6 @@ class LLCCalibratorConfig:
         if self.calibration_epsilons is None:
             # Expanded range for better coverage
             self.calibration_epsilons = [1e-6, 1e-5, 1e-4, 1e-3]
-        if self.calibration_gammas is None:
-            # Include both small and large values per guide
-            self.calibration_gammas = [1.0, 10.0, 100.0, 200.0]
         
         # Auto-set burn-in to 90% of total steps (guide recommendation)
         if self.num_burnin_steps is None:
@@ -198,12 +195,85 @@ class LLCCalibrator:
 
         return loss, {"logits": outputs}
     
+    def calibrate_hyperparameters_multi_gamma(self,
+                                         model: nn.Module,
+                                         train_loader: DataLoader,
+                                         gamma_values: List[float],
+                                         checkpoint_name: str = None,
+                                         save_path: str = None,
+                                         use_tuned_beta: bool = True) -> Dict[str, float]:
+        """
+        Calibrate SGLD hyperparameters across multiple gamma values, selecting the best
+        (epsilon, gamma, beta) combination based on MALA acceptance rate.
+        
+        Args:
+            model: Model to calibrate for
+            train_loader: Training data loader
+            gamma_values: List of gamma values to test
+            checkpoint_name: Name for saving results
+            save_path: Directory to save calibration results
+            use_tuned_beta: Whether to use tuned beta from analyzer or default
+            
+        Returns:
+            Dictionary with optimal hyperparameters selected based on MALA acceptance
+        """
+        print("============================================================")
+        print("STARTING MULTI-GAMMA LLC HYPERPARAMETER CALIBRATION")
+        print("============================================================")
+        
+        all_results = []
+        original_gamma = self.config.gamma
+        
+        try:
+            for i, gamma in enumerate(gamma_values):
+                print(f"\n{'='*60}")
+                print(f"GAMMA SWEEP {i+1}/{len(gamma_values)}: γ = {gamma}")
+                print(f"{'='*60}")
+                
+                # Create a deep copy of the model for each gamma to prevent contamination
+                model_copy = copy.deepcopy(model)
+                print(f"  Created fresh model copy with {sum(p.numel() for p in model_copy.parameters()):,} parameters")
+                
+                # Temporarily set this gamma value
+                self.config.gamma = gamma
+                
+                # Run calibration for this gamma with the fresh model copy
+                try:
+                    result = self.calibrate_hyperparameters(
+                        model=model_copy,  # Use fresh copy instead of contaminated original
+                        train_loader=train_loader,
+                        checkpoint_name=f"{checkpoint_name}_gamma_{gamma}" if checkpoint_name else None,
+                        save_path=f"{save_path}/gamma_{gamma}" if save_path else None,
+                        selection_method="mala",  # Always use MALA for multi-gamma
+                        use_tuned_beta=use_tuned_beta
+                    )
+                    
+                    # Add gamma to the result
+                    result['gamma'] = gamma
+                    all_results.append(result)
+                    
+                    print(f"✅ Gamma {gamma} completed successfully")
+                    print(f"   Selected: ε={result['epsilon']:.2e}, β={result['nbeta']:.3f}")
+                    if 'mala_acceptance' in result:
+                        print(f"   MALA acceptance: {result['mala_acceptance']:.3f}")
+                    
+                except Exception as e:
+                    print(f"❌ Gamma {gamma} failed: {e}")
+                    continue
+            
+            # Select best result based on MALA acceptance rate
+            return self._select_best_multi_gamma_result(all_results)
+            
+        finally:
+            # Restore original gamma
+            self.config.gamma = original_gamma
+
     def calibrate_hyperparameters(self, 
                                 model: nn.Module, 
                                 train_loader: DataLoader,
                                 checkpoint_name: str = None,
                                 save_path: str = None,
-                                selection_method: str = "stability",
+                                selection_method: str = "mala",
                                 use_tuned_beta: bool = False) -> Dict[str, float]:
         """
         Calibrate SGLD hyperparameters using EpsilonBetaAnalyzer.
@@ -249,9 +319,8 @@ class LLCCalibrator:
         
         print(f"Using {len(train_loader.dataset)} samples for calibration")
         print(f"Testing {len(self.config.calibration_epsilons)} epsilon values")
-        print(f"Testing {len(self.config.calibration_gammas)} gamma values") 
         print(f"Epsilon range: {[f'{e:.1e}' for e in self.config.calibration_epsilons]}")
-        print(f"Gamma range: {self.config.calibration_gammas}")
+        print(f"Gamma value tested: {self.config.gamma}")
         
         # Initialize EpsilonBetaAnalyzer (the proven devinterp tool)
         analyzer = EpsilonBetaAnalyzer()
@@ -284,32 +353,12 @@ class LLCCalibrator:
         # Extract optimal parameters using chosen selection criteria
         optimal_params = self._extract_optimal_params(analyzer, calibration_loader, selection_method, use_tuned_beta)
         
-        # # Create loss trace plots from the calibration runs if save_path provided
-        # if save_path and analyzer.sweep_df is not None and len(analyzer.sweep_df) > 0:
-        #     print("Creating calibration loss trace plots...")
-        #     os.makedirs(save_path, exist_ok=True)
-            
-        #     # Plot the best calibration run's loss trace
-        #     best_idx = analyzer.sweep_df['llc/final'].idxmax() if 'llc/final' in analyzer.sweep_df.columns else 0
-        #     if 'llc/trace' in analyzer.sweep_df.columns:
-        #         best_trace = analyzer.sweep_df.loc[best_idx, 'llc/trace']
-        #         if best_trace is not None:
-        #             # Create a results dict compatible with plot_sampling_evolution
-        #             trace_results = {'loss/trace': best_trace}
-        #             trace_plot_path = os.path.join(save_path, "calibration_best_trace.png")
-        #             self.plot_sampling_evolution(
-        #                 trace_results,
-        #                 save_path=trace_plot_path,
-        #                 show=False
-        #             )
-        #             print(f"Best calibration trace plot saved to {trace_plot_path}")
-        
+       
         # Save calibration results
         if save_path:
             calibration_results = {
                 "optimal_params": optimal_params,
                 "calibration_epsilons": self.config.calibration_epsilons,
-                "calibration_gammas": self.config.calibration_gammas,
                 "model_parameters": num_params,
                 "checkpoint_name": checkpoint_name,
             }
@@ -456,6 +505,11 @@ class LLCCalibrator:
         else:
             llc_std = None
         
+        # Extract MALA acceptance rate if available
+        mala_acceptance = None
+        if 'mala_accept/mean' in best_row:
+            mala_acceptance = float(best_row['mala_accept/mean'])
+        
         best_params = {
             'epsilon': float(best_row['epsilon']),
             'gamma': float(self.config.gamma),  # Always from config (not tuned)
@@ -464,7 +518,8 @@ class LLCCalibrator:
             'llc_std': llc_std,
             'llc_std_over_mean': float(best_row['llc/std_over_mean']),
             'beta_source': beta_source,
-            'gamma_source': 'fixed_config'  # Make it clear gamma is not tuned
+            'gamma_source': 'fixed_config',  # Make it clear gamma is not tuned
+            'mala_acceptance': mala_acceptance  # Include MALA acceptance rate
         }
         
         print(f"\nSelected parameters ({selection_method}-based selection):")
@@ -473,8 +528,10 @@ class LLCCalibrator:
         print(f"  β = {best_params['nbeta']:.3f} ({beta_source})")
         print(f"  LLC mean = {best_params['llc_mean']:.4f}")
         print(f"  LLC std/mean = {best_params['llc_std_over_mean']:.4f}")
-        if 'llc_std' in best_params:
+        if 'llc_std' in best_params and best_params['llc_std'] is not None:
             print(f"  LLC std = {best_params['llc_std']:.4f}")
+        if best_params['mala_acceptance'] is not None:
+            print(f"  MALA acceptance = {best_params['mala_acceptance']:.3f}")
         
         if best_params['llc_mean'] < 0:
             print(f"  ⚠️  WARNING: Negative LLC selected - may need parameter adjustment")
@@ -535,6 +592,62 @@ class LLCCalibrator:
             print(f"⚠️  No positive LLC found, using best MALA acceptance = {acceptance_rate:.3f}")
         
         return best_row
+    
+    def _select_best_multi_gamma_result(self, all_results: List[Dict]) -> Dict[str, float]:
+        """
+        Select the best result from multiple gamma calibrations based on MALA acceptance rate.
+        """
+        if not all_results:
+            raise ValueError("No successful calibration results to choose from")
+        
+        print(f"\n{'='*60}")
+        print("MULTI-GAMMA RESULT COMPARISON")
+        print(f"{'='*60}")
+        
+        # Target MALA acceptance rate (0.90-0.95 is ideal)
+        target_acceptance = 0.92
+        
+        # Find results with MALA data and calculate distances from target
+        valid_results = []
+        for result in all_results:
+            if 'mala_acceptance' in result and result['mala_acceptance'] is not None:
+                distance = abs(result['mala_acceptance'] - target_acceptance)
+                result['mala_distance'] = distance
+                valid_results.append(result)
+        
+        if not valid_results:
+            print("⚠️  No results with MALA data found, falling back to first successful result")
+            return all_results[0]
+        
+        # Sort by MALA acceptance distance (best first)
+        valid_results.sort(key=lambda x: x['mala_distance'])
+        
+        # Display comparison
+        print(f"Results ranked by MALA acceptance (target = {target_acceptance:.3f}):")
+        print("-" * 80)
+        for i, result in enumerate(valid_results):
+            gamma = result['gamma']
+            epsilon = result['epsilon']
+            beta = result['nbeta']
+            mala_acc = result['mala_acceptance']
+            llc_mean = result.get('llc_mean', 'N/A')
+            llc_std = result.get('llc_std_over_mean', 'N/A')
+            
+            marker = "🏆" if i == 0 else f" {i+1}."
+            print(f"{marker} γ={gamma:>6.0f}, ε={epsilon:.2e}, β={beta:>6.1f}, "
+                  f"MALA={mala_acc:.3f} (Δ={result['mala_distance']:.3f}), "
+                  f"LLC={llc_mean:.3f}±{llc_std:.3f}")
+        
+        best_result = valid_results[0]
+        print(f"\n🏆 SELECTED BEST COMBINATION:")
+        print(f"   γ = {best_result['gamma']}")
+        print(f"   ε = {best_result['epsilon']:.2e}")
+        print(f"   β = {best_result['nbeta']:.3f}")
+        print(f"   MALA acceptance = {best_result['mala_acceptance']:.3f}")
+        print(f"   LLC mean = {best_result.get('llc_mean', 'N/A')}")
+        print(f"{'='*60}")
+        
+        return best_result
     
     def _get_default_params(self, dataloader: DataLoader) -> Dict[str, float]:
         """Get default parameters when calibration fails"""
@@ -637,9 +750,21 @@ class LLCCalibrator:
         
         # Verify gradient setup
         grad_params = [p for p in model.parameters() if p.requires_grad]
+        non_grad_params = [p for p in model.parameters() if not p.requires_grad]
         print(f"  Parameters requiring gradients: {len(grad_params)}")
+        print(f"  Parameters NOT requiring gradients: {len(non_grad_params)}")
+        
         if len(grad_params) == 0:
             raise ValueError("No model parameters require gradients!")
+        
+        # Debug: Print first few parameter names and their grad status
+        if len(non_grad_params) > 0:
+            print("  ⚠️  Some parameters don't require gradients:")
+            for i, (name, param) in enumerate(model.named_parameters()):
+                if not param.requires_grad:
+                    print(f"    {name}: requires_grad = {param.requires_grad}")
+                if i >= 5:  # Show only first 5
+                    break
         
         # Prepare data loader
         llc_loader = DataLoader(

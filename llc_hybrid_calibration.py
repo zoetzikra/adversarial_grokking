@@ -8,7 +8,14 @@ This script implements the hybrid approach:
 3. Generate optimized parameters for batch processing with llc_compute_retrospective.py
 
 Usage:
-    python llc_hybrid_calibration.py --checkpoint_dir /path/to/checkpoints --output_dir ./llc_full_calibration_results --device cuda
+    # Single-gamma calibration (original):
+    python llc_hybrid_calibration.py --checkpoint_dir /path/to/checkpoints 
+                    --output_dir ./llc_full_calibration_results --device cuda --selection_method mala
+    
+    # Multi-gamma calibration (new):
+    python llc_hybrid_calibration.py --checkpoint_dir /path/to/checkpoints 
+                    --output_dir ./llc_full_calibration_results --device cuda 
+                    --gamma_values 1000 5000 10000
 """
 
 import torch
@@ -47,6 +54,12 @@ def main():
                        help='Directory to save calibration results')
     parser.add_argument('--device', default='cuda',
                        help='Device to use for computation')
+    parser.add_argument('--selection_method', type=str, default='mala',
+                       help='Selection method to use for calibration (stability or mala)')
+    parser.add_argument('--use_tuned_beta', type=bool, default=False,
+                       help='Use tuned beta instead of default') 
+    parser.add_argument('--gamma_values', type=float, nargs='+', default=None,
+                       help='Multiple gamma values for multi-gamma calibration (e.g., --gamma_values 1000 5000 10000)')
     args = parser.parse_args()
     
     # Always add timestamp to output directory to prevent overwrites
@@ -64,6 +77,15 @@ def main():
     print("=" * 80)
     print(f"Key checkpoints to calibrate: {key_checkpoints}")
     print(f"Checkpoint directory: {args.checkpoint_dir}")
+    
+    # Display calibration method
+    if args.gamma_values is not None:
+        print(f"🎯 MULTI-GAMMA CALIBRATION: Testing γ = {args.gamma_values}")
+        print("   Will select best (ε, γ, β) combination based on MALA acceptance")
+    else:
+        print(f"📊 SINGLE-GAMMA CALIBRATION: Using γ = {calibrator_config.gamma}")
+        print(f"   Selection method: {args.selection_method}")
+    print(f"Use tuned beta: {args.use_tuned_beta}")
     print(f"Output directory: {args.output_dir}")
     print("=" * 80)
     
@@ -109,20 +131,57 @@ def main():
             checkpoint_name = f"checkpoint-s:{step}"
             save_path = os.path.join(args.output_dir, f"{checkpoint_name}_{timestamp}")
             
-            optimal_params = llc_calibrator.calibrate_hyperparameters(
+            # Choose between single-gamma and multi-gamma calibration
+            if args.gamma_values is not None:
+                # Multi-gamma calibration
+                print(f"Using multi-gamma calibration with γ = {args.gamma_values}")
+                optimal_params = llc_calibrator.calibrate_hyperparameters_multi_gamma(
+                    model=model,
+                    train_loader=train_loader,
+                    gamma_values=args.gamma_values,
+                    checkpoint_name=checkpoint_name,
+                    save_path=save_path,
+                    use_tuned_beta=args.use_tuned_beta
+                )
+            else:
+                # Single-gamma calibration (original method)
+                print(f"Using single-gamma calibration with γ = {llc_calibrator.config.gamma}")
+                optimal_params = llc_calibrator.calibrate_hyperparameters(
+                    model, 
+                    train_loader, 
+                    checkpoint_name=checkpoint_name,
+                    save_path=save_path,
+                    selection_method=args.selection_method,  # Use command line arg
+                    use_tuned_beta=args.use_tuned_beta  # Set to True to use tuned beta instead of default
+                )
+            
+            # Estimate LLC with optimal parameters and create final trace
+            print("Estimating LLC with optimal parameters...")
+            llc_results = llc_calibrator.estimate_llc(
                 model, 
                 train_loader, 
-                checkpoint_name=checkpoint_name,
-                save_path=save_path,
-                selection_method="stability",  # Options: "stability" or "mala"
-                use_tuned_beta=False  # Set to True to use tuned beta instead of default
+                hyperparams=optimal_params,
+                save_path=os.path.join(save_path, "final_llc_estimation"),
+                seed=43  # Use different seed for final estimation to avoid exact duplication
             )
+            
+            # Plot the final LLC estimation trace
+            if 'loss/trace' in llc_results:
+                final_trace_path = os.path.join(save_path, "final_llc_trace.png")
+                llc_calibrator.plot_sampling_evolution(
+                    llc_results, 
+                    save_path=final_trace_path, 
+                    show=False
+                )
+                print(f"Final LLC trace plot saved to {final_trace_path}")
+                print(f"Final trace shape: {llc_results['loss/trace'].shape}")
             
             # Store results
             result = {
                 'step': step,
                 'checkpoint_path': checkpoint_path,
                 'optimal_params': optimal_params,
+                'final_llc_results': llc_results,  # Include final LLC estimation results
                 'model_parameters': sum(p.numel() for p in model.parameters()),
             }
             
@@ -132,6 +191,8 @@ def main():
             print(f"   ε = {optimal_params['epsilon']:.2e}")
             print(f"   γ = {optimal_params['gamma']:.1f}")
             print(f"   β = {optimal_params['nbeta']:.3f}")
+            if 'mala_acceptance' in optimal_params and optimal_params['mala_acceptance'] is not None:
+                print(f"   MALA acceptance = {optimal_params['mala_acceptance']:.3f}")
             if 'llc_mean' in optimal_params:
                 print(f"   LLC = {optimal_params['llc_mean']:.4f}")
             

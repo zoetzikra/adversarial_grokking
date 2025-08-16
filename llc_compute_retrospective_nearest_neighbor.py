@@ -135,8 +135,11 @@ def main():
         device=args.device,
         batch_size=args.batch_size
     )
+    # temporarily override the num_chains to 2
+    calibrator_config.num_chains = 2
+
     llc_calibrator = LLCCalibrator(calibrator_config)
-    
+
     print(f"\nLLC Estimation Configuration:")
     print(f"  Chains: {calibrator_config.num_chains}")
     print(f"  Steps: {calibrator_config.num_steps}")
@@ -183,7 +186,12 @@ def main():
             
             # Extract results
             llc_mean = float(llc_results.get('llc/mean', np.nan))
-            llc_std = float(llc_results.get('llc/std', np.nan))
+            
+            # Handle llc/stds like llc/means - take mean of the array
+            if 'llc/stds' in llc_results and llc_results['llc/stds'] is not None:
+                llc_std = float(llc_results['llc/stds'].mean())
+            else:
+                llc_std = np.nan
             
             # Get MALA acceptance rate if available
             mala_acceptance = float(llc_results.get('mala_accept/mean', np.nan))
@@ -275,25 +283,49 @@ def main():
 def save_results(results, output_dir, intermediate=False):
     """Save results to CSV and JSON files"""
     
-    # Convert to DataFrame
-    results_df = pd.DataFrame(results)
-    
-    # Save CSV
-    suffix = "_intermediate" if intermediate else ""
-    csv_file = os.path.join(output_dir, f'llc_nearest_neighbor_results{suffix}.csv')
-    results_df.to_csv(csv_file, index=False)
-    
-    # Save JSON (more detailed)
-    json_file = os.path.join(output_dir, f'llc_nearest_neighbor_results{suffix}.json')
-    with open(json_file, 'w') as f:
-        json.dump(results, f, indent=2, default=str)
-    
-    if not intermediate:
-        # Create summary plot
-        create_summary_plot(results_df, output_dir)
+    try:
+        if len(results) == 0:
+            print("⚠️  No results to save")
+            return
         
-        # Create analysis summary
-        create_analysis_summary(results_df, output_dir)
+        # Convert to DataFrame
+        results_df = pd.DataFrame(results)
+        
+        # Save CSV
+        suffix = "_intermediate" if intermediate else ""
+        csv_file = os.path.join(output_dir, f'llc_nearest_neighbor_results{suffix}.csv')
+        results_df.to_csv(csv_file, index=False)
+        
+        # Save JSON (more detailed)
+        json_file = os.path.join(output_dir, f'llc_nearest_neighbor_results{suffix}.json')
+        with open(json_file, 'w') as f:
+            json.dump(results, f, indent=2, default=str)
+        
+        if not intermediate:
+            try:
+                # Create summary plot
+                create_summary_plot(results_df, output_dir)
+            except Exception as e:
+                print(f"⚠️  Failed to create summary plot: {e}")
+            
+            try:
+                # Create analysis summary
+                create_analysis_summary(results_df, output_dir)
+            except Exception as e:
+                print(f"⚠️  Failed to create analysis summary: {e}")
+        
+        print(f"✅ Results saved to {csv_file}")
+        
+    except Exception as e:
+        print(f"❌ Failed to save results: {e}")
+        # Try to save at least a basic backup
+        try:
+            backup_file = os.path.join(output_dir, f'backup_results_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json')
+            with open(backup_file, 'w') as f:
+                json.dump(results, f, indent=2, default=str)
+            print(f"📋 Backup saved to {backup_file}")
+        except:
+            print("❌ Could not save backup either")
 
 def create_summary_plot(df, output_dir):
     """Create summary visualization of LLC evolution with parameter annotations"""
