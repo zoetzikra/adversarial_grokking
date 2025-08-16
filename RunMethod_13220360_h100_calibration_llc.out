@@ -1,166 +1,0 @@
-✅ Job started at: Sat Jul 19 13:09:41 CEST 2025
-============================================================================================== 
-Warning! Mixing Conda and module environments may lead to corruption of the
-user environment. 
-We do not recommend users mixing those two environments unless absolutely
-necessary. Note that 
-SURF does not provide any support for Conda environment.
-For more information, please refer to our software policy page:
-https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
-
-Remember that many packages have already been installed on the system and can
-be loaded using 
-the 'module load <package__name>' command. If you are uncertain if a package is
-already available 
-on the system, please use 'module avail' or 'module spider' to search for it.
-============================================================================================== 
-🔍 Attempting to load OpenCV...
-⚠️  Could not load OpenCV module, checking Python availability...
-✅ OpenCV 4.8.1 is available via Python
-🔍 Checking FFCV installation...
-✅ FFCV is available
-Calibrating LLC hyperparameters on trained model...
-Starting hyperparameter calibration...
-Model has 699,066 parameters
-Using epsilon range: ['1.0e-06', '5.0e-06', '1.0e-05', '5.0e-05', '1.0e-04']
-  0%|          | 0/25 [00:00<?, ?it/s]/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/slt/sampler.py:117: UserWarning: Using passed in nbeta. Make sure callbacks are also initialized with the same nbeta.
-  warnings.warn(
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:244: UserWarning: You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
-  warnings.warn(
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:285: UserWarning: If you're setting a nbeta or temperature in optimizer_kwargs, please also make sure to set it in the callbacks.
-  warnings.warn(
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:52: UserWarning: You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
-  warnings.warn(
-  4%|▍         | 1/25 [00:20<08:10, 20.43s/it]  8%|▊         | 2/25 [00:40<07:38, 19.93s/it] 12%|█▏        | 3/25 [00:59<07:15, 19.81s/it] 16%|█▌        | 4/25 [01:19<06:56, 19.85s/it] 20%|██        | 5/25 [01:39<06:36, 19.85s/it] 24%|██▍       | 6/25 [01:59<06:17, 19.87s/it] 28%|██▊       | 7/25 [02:19<05:59, 19.97s/it] 32%|███▏      | 8/25 [02:39<05:39, 19.97s/it] 36%|███▌      | 9/25 [02:59<05:19, 19.97s/it] 40%|████      | 10/25 [03:19<04:59, 19.99s/it] 44%|████▍     | 11/25 [03:39<04:40, 20.06s/it] 48%|████▊     | 12/25 [03:59<04:20, 20.02s/it] 52%|█████▏    | 13/25 [04:19<04:00, 20.00s/it] 56%|█████▌    | 14/25 [04:39<03:39, 20.00s/it] 60%|██████    | 15/25 [04:59<03:20, 20.08s/it] 64%|██████▍   | 16/25 [04:59<02:06, 14.08s/it] 68%|██████▊   | 17/25 [05:04<01:29, 11.19s/it] 72%|███████▏  | 18/25 [05:08<01:04,  9.17s/it] 76%|███████▌  | 19/25 [05:18<00:55,  9.26s/it] 80%|████████  | 20/25 [05:22<00:39,  7.82s/it] 84%|████████▍ | 21/25 [05:27<00:27,  6.82s/it] 88%|████████▊ | 22/25 [05:31<00:18,  6.11s/it] 92%|█████████▏| 23/25 [05:36<00:11,  5.62s/it] 96%|█████████▌| 24/25 [05:40<00:05,  5.27s/it]100%|██████████| 25/25 [05:45<00:00,  5.04s/it]100%|██████████| 25/25 [05:45<00:00, 13.81s/it]
-Error in calibration for epsilon=3.16e-05, beta=0.462: EpsilonBetaAnalyzer timed out
-Error in calibration for epsilon=3.16e-05, beta=8.210: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.16e-05, beta=145.990: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.16e-05, beta=2596.119: NaN detected in loss at chain 1, draw 0
-Error in calibration for epsilon=3.16e-05, beta=46166.241: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=1.00e-04, beta=0.462: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=1.00e-04, beta=8.210: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=1.00e-04, beta=145.990: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=1.00e-04, beta=2596.119: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=1.00e-04, beta=46166.241: NaN detected in loss at chain 0, draw 0
-EpsilonBetaAnalyzer failed: 'float' object has no attribute 'shape'
-Falling back to manual grid search...
-Performing manual hyperparameter grid search...
-Default nbeta for dataloader: 46.166
-Testing 5 epsilon values, 3 nbeta values, 3 gamma values
-Testing epsilon=1.00e-06, nbeta=23.083, gamma=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=23.083, gamma=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=23.083, gamma=10.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=46.166, gamma=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=46.166, gamma=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=46.166, gamma=10.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=92.332, gamma=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=92.332, gamma=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, nbeta=92.332, gamma=10.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=23.083, gamma=1.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=23.083, gamma=5.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=23.083, gamma=10.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=46.166, gamma=1.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=46.166, gamma=5.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=46.166, gamma=10.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=92.332, gamma=1.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=92.332, gamma=5.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, nbeta=92.332, gamma=10.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=23.083, gamma=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=23.083, gamma=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=23.083, gamma=10.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=46.166, gamma=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=46.166, gamma=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=46.166, gamma=10.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=92.332, gamma=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, nbeta=92.332, gamma=5.0
-  ✗ Error: NaN detected in loss at chain 1, draw 0
-Testing epsilon=1.00e-05, nbeta=92.332, gamma=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=23.083, gamma=1.0
-  ✗ Error: NaN detected in loss at chain 1, draw 0
-Testing epsilon=5.00e-05, nbeta=23.083, gamma=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=23.083, gamma=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=46.166, gamma=1.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=46.166, gamma=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=46.166, gamma=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=92.332, gamma=1.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=92.332, gamma=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-05, nbeta=92.332, gamma=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=23.083, gamma=1.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=23.083, gamma=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=23.083, gamma=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=46.166, gamma=1.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=46.166, gamma=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=46.166, gamma=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=92.332, gamma=1.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=92.332, gamma=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-04, nbeta=92.332, gamma=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-
-=== MANUAL CALIBRATION RESULTS ===
-Successful runs: 0/45
-No successful runs found. Consider:
-  1. Using even smaller epsilon values
-  2. Checking model stability
-  3. Using different gamma values
-  4. Reducing the number of draws
-
-Current config values:
-  llc_epsilon: 3.00e-02
-  llc_gamma: 1.00
-Calibration complete. Review plots and update config accordingly.
-
-JOB STATISTICS
-==============
-Job ID: 13220360
-Cluster: snellius
-User/Group: ztzifa/ztzifa
-State: COMPLETED (exit code 0)
-Nodes: 1
-Cores per node: 16
-CPU Utilized: 00:25:41
-CPU Efficiency: 6.17% of 06:56:32 core-walltime
-Job Wall-clock time: 00:26:02
-Memory Utilized: 3.56 GB
-Memory Efficiency: 8.91% of 40.00 GB (40.00 GB/node)

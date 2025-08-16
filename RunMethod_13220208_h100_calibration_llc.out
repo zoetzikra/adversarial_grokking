@@ -1,145 +1,0 @@
-✅ Job started at: Sat Jul 19 12:21:12 CEST 2025
-============================================================================================== 
-Warning! Mixing Conda and module environments may lead to corruption of the
-user environment. 
-We do not recommend users mixing those two environments unless absolutely
-necessary. Note that 
-SURF does not provide any support for Conda environment.
-For more information, please refer to our software policy page:
-https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
-
-Remember that many packages have already been installed on the system and can
-be loaded using 
-the 'module load <package__name>' command. If you are uncertain if a package is
-already available 
-on the system, please use 'module avail' or 'module spider' to search for it.
-============================================================================================== 
-🔍 Attempting to load OpenCV...
-⚠️  Could not load OpenCV module, checking Python availability...
-✅ OpenCV 4.8.1 is available via Python
-🔍 Checking FFCV installation...
-✅ FFCV is available
-Calibrating LLC hyperparameters on trained model...
-Starting hyperparameter calibration...
-  0%|          | 0/25 [00:00<?, ?it/s]/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/slt/sampler.py:117: UserWarning: Using passed in nbeta. Make sure callbacks are also initialized with the same nbeta.
-  warnings.warn(
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:240: UserWarning: You are taking more draws than burn-in steps, your LLC estimates will likely be underestimates. Please check LLC chain convergence.
-  warnings.warn(
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:244: UserWarning: You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
-  warnings.warn(
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:285: UserWarning: If you're setting a nbeta or temperature in optimizer_kwargs, please also make sure to set it in the callbacks.
-  warnings.warn(
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/backends/default/slt/sampler.py:52: UserWarning: You are taking more sample batches than there are dataloader batches available, this removes some randomness from sampling but is probably fine. (All sample batches beyond the number dataloader batches are cycled from the start, f.e. 9 samples from [A, B, C] would be [B, A, C, B, A, C, B, A, C].)
-  warnings.warn(
-  4%|▍         | 1/25 [00:02<00:50,  2.12s/it]  8%|▊         | 2/25 [00:04<00:46,  2.02s/it] 12%|█▏        | 3/25 [00:05<00:42,  1.92s/it] 16%|█▌        | 4/25 [00:07<00:39,  1.88s/it] 20%|██        | 5/25 [00:09<00:37,  1.86s/it] 24%|██▍       | 6/25 [00:11<00:35,  1.85s/it] 28%|██▊       | 7/25 [00:13<00:34,  1.89s/it] 32%|███▏      | 8/25 [00:15<00:31,  1.87s/it] 36%|███▌      | 9/25 [00:16<00:29,  1.86s/it] 40%|████      | 10/25 [00:17<00:21,  1.40s/it] 44%|████▍     | 11/25 [00:19<00:21,  1.52s/it] 48%|████▊     | 12/25 [00:20<00:20,  1.59s/it] 52%|█████▏    | 13/25 [00:22<00:20,  1.70s/it] 56%|█████▌    | 14/25 [00:23<00:14,  1.30s/it] 60%|██████    | 15/25 [00:23<00:10,  1.02s/it] 64%|██████▍   | 16/25 [00:25<00:11,  1.25s/it] 68%|██████▊   | 17/25 [00:27<00:11,  1.41s/it] 72%|███████▏  | 18/25 [00:27<00:07,  1.10s/it] 76%|███████▌  | 19/25 [00:27<00:05,  1.14it/s] 80%|████████  | 20/25 [00:28<00:03,  1.38it/s] 84%|████████▍ | 21/25 [00:30<00:04,  1.04s/it] 88%|████████▊ | 22/25 [00:30<00:02,  1.10it/s] 92%|█████████▏| 23/25 [00:31<00:01,  1.34it/s] 96%|█████████▌| 24/25 [00:31<00:00,  1.58it/s]100%|██████████| 25/25 [00:31<00:00,  1.81it/s]100%|██████████| 25/25 [00:31<00:00,  1.27s/it]
-/home/ztzifa/.conda/envs/devinterp_env/lib/python3.13/site-packages/devinterp/optim/sgld.py:139: UserWarning: Warning: nbeta set to 1, LLC estimates will be off unless you know what you're doing. Use utils.default_nbeta(dataloader) instead
-  warnings.warn(
-Error in calibration for epsilon=3.00e-07, beta=46166.24: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-06, beta=2596.12: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-06, beta=46166.24: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-05, beta=145.99: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-05, beta=2596.12: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-05, beta=46166.24: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-04, beta=8.21: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-04, beta=145.99: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-04, beta=2596.12: NaN detected in loss at chain 0, draw 0
-Error in calibration for epsilon=3.00e-04, beta=46166.24: NaN detected in loss at chain 0, draw 0
-EpsilonBetaAnalyzer failed: 'float' object has no attribute 'shape'
-Falling back to manual grid search...
-Performing manual hyperparameter grid search...
-Testing epsilon=1.00e-06, beta=0.5
-  ✗ NaN result
-Testing epsilon=1.00e-06, beta=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, beta=2.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, beta=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-06, beta=10.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, beta=0.5
-  ✗ NaN result
-Testing epsilon=5.00e-06, beta=1.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, beta=2.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, beta=5.0
-  ✗ NaN result
-Testing epsilon=5.00e-06, beta=10.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, beta=0.5
-  ✗ NaN result
-Testing epsilon=1.00e-05, beta=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, beta=2.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, beta=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-05, beta=10.0
-  ✗ NaN result
-Testing epsilon=5.00e-05, beta=0.5
-  ✗ NaN result
-Testing epsilon=5.00e-05, beta=1.0
-  ✗ NaN result
-Testing epsilon=5.00e-05, beta=2.0
-  ✗ NaN result
-Testing epsilon=5.00e-05, beta=5.0
-  ✗ NaN result
-Testing epsilon=5.00e-05, beta=10.0
-  ✗ NaN result
-Testing epsilon=1.00e-04, beta=0.5
-  ✗ NaN result
-Testing epsilon=1.00e-04, beta=1.0
-  ✗ NaN result
-Testing epsilon=1.00e-04, beta=2.0
-  ✗ NaN result
-Testing epsilon=1.00e-04, beta=5.0
-  ✗ NaN result
-Testing epsilon=1.00e-04, beta=10.0
-  ✗ NaN result
-Testing epsilon=5.00e-04, beta=0.5
-  ✗ NaN result
-Testing epsilon=5.00e-04, beta=1.0
-  ✗ NaN result
-Testing epsilon=5.00e-04, beta=2.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-04, beta=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=5.00e-04, beta=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-03, beta=0.5
-  ✗ Error: NaN detected in loss at chain 1, draw 11
-Testing epsilon=1.00e-03, beta=1.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-03, beta=2.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-03, beta=5.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-Testing epsilon=1.00e-03, beta=10.0
-  ✗ Error: NaN detected in loss at chain 0, draw 0
-
-=== MANUAL CALIBRATION RESULTS ===
-Successful runs: 0/35
-No successful runs found. Consider:
-  1. Using even smaller epsilon values
-  2. Checking model stability
-  3. Using different beta values
-
-Current config values:
-  llc_epsilon: 3.00e-02
-  llc_gamma: 5.00
-Calibration complete. Review plots and update config accordingly.
-
-JOB STATISTICS
-==============
-Job ID: 13220208
-Cluster: snellius
-User/Group: ztzifa/ztzifa
-State: COMPLETED (exit code 0)
-Nodes: 1
-Cores per node: 16
-CPU Utilized: 00:01:17
-CPU Efficiency: 5.53% of 00:23:12 core-walltime
-Job Wall-clock time: 00:01:27
-Memory Utilized: 1.94 GB
-Memory Efficiency: 4.84% of 40.00 GB (40.00 GB/node)

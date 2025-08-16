@@ -164,3 +164,9 @@ wandb/
 logs/
 models/
 data/
+
+*.pt
+*.out
+devinterp_ex_*
+reference_*
+effective_dim_calibration*

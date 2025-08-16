@@ -80,10 +80,11 @@ def config_resnet18_cifar10():
     # LLC estimation parameters
     config.compute_LLC_estimate = True
     config.llc_epsilon = 0.03        # SGLD step size (calibrate first)
-    config.llc_gamma = 1.0           # localization parameter
+    config.llc_gamma = 5.0           # localization parameter
+    config.llc_beta = None           # inverse temperature parameter (if None, uses default_nbeta)
     config.llc_num_chains = 2        # number of SGLD chains
     config.llc_num_draws = 500       # samples per chain
-    config.llc_num_burnin = 100      # burn-in samples
+    config.llc_num_burnin = 450      # burn-in samples
     config.llc_calibrate = False     # set True for initial calibration
     
     # Device configuration

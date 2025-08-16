@@ -1,0 +1,43 @@
+#!/bin/bash
+#SBATCH --partition=gpu_h100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=8
+#SBATCH --job-name=adversarial_grokking_ffcv
+#SBATCH --output=RunMethod_%A_h100_test_test_mala_calibration.out
+#SBATCH --time=12:00:00
+#SBATCH --mem=40G
+#SBATCH --hint=nomultithread
+
+echo "✅ Job started at: $(date)"
+
+# Load modules
+module purge
+module load 2023
+module load Anaconda3/2023.07-2
+module load CUDA/12.1.1
+
+
+# Activate Conda environment
+source activate devinterp_env
+echo "Activated Conda environment"
+
+
+python test_mala_calibration.py
+
+
+# # Set checkpoint directory (UPDATE THIS PATH)
+# CHECKPOINT_DIR="/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025"
+                
+
+# # Run hybrid calibration
+# echo "Starting hybrid LLC calibration..."
+# echo "Checkpoint directory: $CHECKPOINT_DIR"
+# echo "Key checkpoints: 8, 24, 55, 94, 162, 473, 809, 1382, 3088, 9017, 15408, 26327, 58801, 100417, 131331, 224398, 383418, 500000"
+
+# python llc_hybrid_calibration.py \
+#     --checkpoint_dir "$CHECKPOINT_DIR" \
+#     --output_dir "./llc_full_calibration_results" \
+#     --device cuda
+
+echo "Full calibration completed at: $(date)"
+

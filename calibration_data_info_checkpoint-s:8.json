@@ -1,0 +1,5 @@
+{
+  "dataloader_length": 4,
+  "batch_size": 256,
+  "seed": 42
+}

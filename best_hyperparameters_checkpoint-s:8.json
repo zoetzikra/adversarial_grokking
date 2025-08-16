@@ -1,0 +1,19 @@
+{
+  "checkpoint_name": "checkpoint-s:8",
+  "model_class": "PreActResNet",
+  "best_hyperparameters": {
+    "epsilon": 1e-14,
+    "beta": 45000.00000000002,
+    "llc_mean": "0.1025934",
+    "llc_std_over_mean": "17.296743"
+  },
+  "calibration_timestamp": "2025-08-14 14:47:19",
+  "config_info": {
+    "llc_epsilon": 0.03,
+    "llc_gamma": 5.0,
+    "llc_beta": null,
+    "llc_num_chains": 2,
+    "llc_num_draws": 500,
+    "llc_num_burnin": 450
+  }
+}

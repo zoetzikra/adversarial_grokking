@@ -1,0 +1,206 @@
+[
+  {
+    "step": 8,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:8.pt",
+    "optimal_params": {
+      "epsilon": 0.001,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.16335925459861755,
+      "llc_std_over_mean": 0.6914086937904358
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 24,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:24.pt",
+    "optimal_params": {
+      "epsilon": 0.001,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.0966307520866394,
+      "llc_std_over_mean": 0.4774022400379181
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 55,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:55.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-06,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.1461440771818161,
+      "llc_std_over_mean": 0.3850213289260864
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 94,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:94.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-06,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.12706710398197174,
+      "llc_std_over_mean": 0.2978486716747284
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 162,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:162.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.315865159034729,
+      "llc_std_over_mean": 0.20375077426433563
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 473,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:473.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.5832759737968445,
+      "llc_std_over_mean": 0.22050762176513672
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 809,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:809.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-06,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.2502354383468628,
+      "llc_std_over_mean": 0.1840653121471405
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 1382,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:1382.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.6802570819854736,
+      "llc_std_over_mean": 0.18742090463638306
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 3088,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:3088.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 108.80833435058594,
+      "llc_std_over_mean": 0.21201597154140472
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 9017,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:9017.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 66.99862670898438,
+      "llc_std_over_mean": 0.27151551842689514
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 15408,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:15408.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.47503671050071716,
+      "llc_std_over_mean": 0.18399319052696228
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 26327,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:26327.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.36791422963142395,
+      "llc_std_over_mean": 0.1998128592967987
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 58801,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:58801.pt",
+    "optimal_params": {
+      "epsilon": 0.001,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 0.6647540330886841,
+      "llc_std_over_mean": 0.26268914341926575
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 131331,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:131331.pt",
+    "optimal_params": {
+      "epsilon": 0.001,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 1.2694270610809326,
+      "llc_std_over_mean": 0.25184935331344604
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 224398,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:224398.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 1.0335566997528076,
+      "llc_std_over_mean": 0.28123578429222107
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 383418,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:383418.pt",
+    "optimal_params": {
+      "epsilon": 9.999999999999999e-05,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 2.3134560585021973,
+      "llc_std_over_mean": 0.5632914900779724
+    },
+    "model_parameters": 699066
+  },
+  {
+    "step": 500000,
+    "checkpoint_path": "/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025/checkpoint-s:500000.pt",
+    "optimal_params": {
+      "epsilon": 0.001,
+      "gamma": 1000.0,
+      "nbeta": 82.07331788168325,
+      "llc_mean": 5.830937385559082,
+      "llc_std_over_mean": 0.5743476748466492
+    },
+    "model_parameters": 699066
+  }
+]
