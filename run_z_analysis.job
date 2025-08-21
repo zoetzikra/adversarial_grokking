@@ -1,0 +1,27 @@
+#!/bin/bash
+#SBATCH --partition=gpu_h100
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=8
+#SBATCH --job-name=adversarial_grokking_ffcv
+#SBATCH --output=RunMethod_%A_h100_analysis.out
+#SBATCH --time=12:00:00
+#SBATCH --mem=40G
+#SBATCH --hint=nomultithread
+
+echo "✅ Job started at: $(date)"
+
+# Load modules
+module purge
+module load 2023
+module load Anaconda3/2023.07-2
+module load CUDA/12.1.1
+
+
+# Activate Conda environment
+source activate devinterp_env
+
+
+python create_paper_style_comparison.py
+
+
+echo "Analysis completed! At $(date)"

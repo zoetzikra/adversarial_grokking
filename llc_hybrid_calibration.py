@@ -71,23 +71,13 @@ def main():
     # Key checkpoints to calibrate (your selected list)
     key_checkpoints = [8, 24, 55, 94, 162, 473, 809, 1382, 3088, 9017, 
                       15408, 26327, 58801, 100471, 131331, 224398, 383418, 500000]
+    # key_checkpoints =  [383418, 500000]
     
     print("=" * 80)
     print("LLC HYBRID CALIBRATION")
     print("=" * 80)
     print(f"Key checkpoints to calibrate: {key_checkpoints}")
     print(f"Checkpoint directory: {args.checkpoint_dir}")
-    
-    # Display calibration method
-    if args.gamma_values is not None:
-        print(f"🎯 MULTI-GAMMA CALIBRATION: Testing γ = {args.gamma_values}")
-        print("   Will select best (ε, γ, β) combination based on MALA acceptance")
-    else:
-        print(f"📊 SINGLE-GAMMA CALIBRATION: Using γ = {calibrator_config.gamma}")
-        print(f"   Selection method: {args.selection_method}")
-    print(f"Use tuned beta: {args.use_tuned_beta}")
-    print(f"Output directory: {args.output_dir}")
-    print("=" * 80)
     
     # Setup output directory
     os.makedirs(args.output_dir, exist_ok=True)
@@ -103,6 +93,18 @@ def main():
     # Initialize calibrator
     calibrator_config = LLCCalibratorConfig(device=args.device)
     llc_calibrator = LLCCalibrator(calibrator_config)
+    
+    # Display calibration method (after calibrator is initialized)
+    if args.gamma_values is not None:
+        print(f"🎯 MULTI-GAMMA CALIBRATION: Testing γ = {args.gamma_values}")
+        print(f"   Selection method: {args.selection_method}")
+        print(f"   Will select best (ε, γ, β) combination based on {args.selection_method} criterion")
+    else:
+        print(f"📊 SINGLE-GAMMA CALIBRATION: Using γ = {calibrator_config.gamma}")
+        print(f"   Selection method: {args.selection_method}")
+    print(f"Use tuned beta: {args.use_tuned_beta}")
+    print(f"Output directory: {args.output_dir}")
+    print("=" * 80)
     
     # Phase 1: Calibrate key checkpoints
     print("\n" + "=" * 60)
@@ -141,7 +143,8 @@ def main():
                     gamma_values=args.gamma_values,
                     checkpoint_name=checkpoint_name,
                     save_path=save_path,
-                    use_tuned_beta=args.use_tuned_beta
+                    use_tuned_beta=args.use_tuned_beta,
+                    selection_method=args.selection_method  # Pass through the selection method
                 )
             else:
                 # Single-gamma calibration (original method)

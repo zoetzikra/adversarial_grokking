@@ -3,7 +3,7 @@
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=8
 #SBATCH --job-name=adversarial_grokking_ffcv
-#SBATCH --output=RunMethod_%A_h100_retrospective_llc_outdatedly_calibrated.out
+#SBATCH --output=RunMethod_%A_h100_retrospective_llc_retrospective_gamma_20.out
 #SBATCH --time=12:00:00
 #SBATCH --mem=40G
 #SBATCH --hint=nomultithread
@@ -22,15 +22,14 @@ source activate devinterp_env
 
 
 CHECKPOINT_DIR="/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025"
-PARAMETER_LOOKUP="/home/ztzifa/grok-adversarial/llc_full_calibration_results/parameter_lookup_gamma_5000.json"
-OUTPUT_DIR="/home/ztzifa/grok-adversarial/llc_full_calibration_results/retrospective_results"
+PARAMETER_LOOKUP="/home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/parameter_lookup.json"
+OUTPUT_DIR="/home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results"
 
 python llc_compute_retrospective_nearest_neighbor.py \
     --checkpoint_dir "$CHECKPOINT_DIR" \
     --parameter_lookup "$PARAMETER_LOOKUP" \
     --output_dir "$OUTPUT_DIR" \
     --verbose
-
 
 echo "Enhanced retrospective processing completed! At $(date)"
 echo "Used nearest-neighbor parameters from {len(calibrated_steps)} calibrated checkpoints"

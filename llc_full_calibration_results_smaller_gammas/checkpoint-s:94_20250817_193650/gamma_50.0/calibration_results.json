@@ -1,0 +1,21 @@
+{
+  "optimal_params": {
+    "epsilon": 1e-06,
+    "gamma": 50.0,
+    "nbeta": 0.8207331788168325,
+    "llc_mean": 0.01872120425105095,
+    "llc_std": 0.0249488465487957,
+    "llc_std_over_mean": 1.3728978633880615,
+    "beta_source": "tuned",
+    "gamma_source": "fixed_config",
+    "mala_acceptance": 0.87815922498703
+  },
+  "calibration_epsilons": [
+    1e-06,
+    1e-05,
+    0.0001,
+    0.001
+  ],
+  "model_parameters": 699066,
+  "checkpoint_name": "checkpoint-s:94_gamma_50.0"
+}

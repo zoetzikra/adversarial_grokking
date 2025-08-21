@@ -93,11 +93,12 @@ class LLCCalibratorConfig:
             self.epsilon = self._scale_epsilon_by_model_size()
         
         # Auto-scale gamma based on model type
+        # FIXED: Previous gamma values (1000-5000) were causing over-localization
+        # Leading to near-zero LLC values despite good MALA acceptance
+        # Using much smaller gamma for meaningful sampling
+        self.gamma = 10.0  # Start with small value for ResNet
         # self.gamma = 50.0
-        # self.gamma = 2000.0
-        # self.gamma = 10000.0
-        self.gamma = 5000.0
-        # self.gamma = 1000.0
+        # self.gamma = 100.0
         
 
     def _scale_epsilon_by_model_size(self) -> float:
@@ -201,10 +202,11 @@ class LLCCalibrator:
                                          gamma_values: List[float],
                                          checkpoint_name: str = None,
                                          save_path: str = None,
-                                         use_tuned_beta: bool = True) -> Dict[str, float]:
+                                         use_tuned_beta: bool = True,
+                                         selection_method: str = "mala") -> Dict[str, float]:
         """
         Calibrate SGLD hyperparameters across multiple gamma values, selecting the best
-        (epsilon, gamma, beta) combination based on MALA acceptance rate.
+        (epsilon, gamma, beta) combination based on specified selection method.
         
         Args:
             model: Model to calibrate for
@@ -213,9 +215,10 @@ class LLCCalibrator:
             checkpoint_name: Name for saving results
             save_path: Directory to save calibration results
             use_tuned_beta: Whether to use tuned beta from analyzer or default
+            selection_method: "mala" or "stability" for parameter selection within each gamma
             
         Returns:
-            Dictionary with optimal hyperparameters selected based on MALA acceptance
+            Dictionary with optimal hyperparameters selected based on specified method
         """
         print("============================================================")
         print("STARTING MULTI-GAMMA LLC HYPERPARAMETER CALIBRATION")
@@ -244,7 +247,7 @@ class LLCCalibrator:
                         train_loader=train_loader,
                         checkpoint_name=f"{checkpoint_name}_gamma_{gamma}" if checkpoint_name else None,
                         save_path=f"{save_path}/gamma_{gamma}" if save_path else None,
-                        selection_method="mala",  # Always use MALA for multi-gamma
+                        selection_method=selection_method,  # Use specified selection method
                         use_tuned_beta=use_tuned_beta
                     )
                     
@@ -261,8 +264,8 @@ class LLCCalibrator:
                     print(f"❌ Gamma {gamma} failed: {e}")
                     continue
             
-            # Select best result based on MALA acceptance rate
-            return self._select_best_multi_gamma_result(all_results)
+            # Select best result based on specified selection method
+            return self._select_best_multi_gamma_result(all_results, selection_method)
             
         finally:
             # Restore original gamma
@@ -307,6 +310,16 @@ class LLCCalibrator:
         # Count parameters
         num_params = sum(p.numel() for p in model.parameters())
         print(f"Model has {num_params:,} parameters")
+        
+        # # CRITICAL DEBUG: Check model integrity at start of calibration
+        # param_tensors = list(model.parameters())
+        # print(f"🔍 DEBUG: Model has {len(param_tensors)} parameter tensors at calibration start")
+        # if len(param_tensors) < 50:  # ResNet should have many more layers
+        #     print("⚠️  WARNING: Model seems to have too few parameter tensors!")
+        #     for i, (name, param) in enumerate(model.named_parameters()):
+        #         print(f"  {i}: {name} -> {param.shape}")
+        #         if i >= 10:
+        #             break
         
         #TODO: maybe use a sample of the datasetfor calibration (that's how it is in the calibration script)
         # Create calibration data loader
@@ -593,17 +606,30 @@ class LLCCalibrator:
         
         return best_row
     
-    def _select_best_multi_gamma_result(self, all_results: List[Dict]) -> Dict[str, float]:
+    def _select_best_multi_gamma_result(self, all_results: List[Dict], selection_method: str = "mala") -> Dict[str, float]:
         """
-        Select the best result from multiple gamma calibrations based on MALA acceptance rate.
+        Select the best result from multiple gamma calibrations based on specified selection method.
+        
+        Args:
+            all_results: List of calibration results from different gamma values
+            selection_method: "mala" (MALA acceptance rate) or "stability" (LLC stability)
         """
         if not all_results:
             raise ValueError("No successful calibration results to choose from")
         
         print(f"\n{'='*60}")
-        print("MULTI-GAMMA RESULT COMPARISON")
+        print(f"MULTI-GAMMA RESULT COMPARISON ({selection_method.upper()} METHOD)")
         print(f"{'='*60}")
         
+        if selection_method == "mala":
+            return self._select_multi_gamma_by_mala(all_results)
+        elif selection_method == "stability":
+            return self._select_multi_gamma_by_stability(all_results)
+        else:
+            raise ValueError(f"Unknown selection method: {selection_method}")
+    
+    def _select_multi_gamma_by_mala(self, all_results: List[Dict]) -> Dict[str, float]:
+        """Select best gamma result based on MALA acceptance rate"""
         # Target MALA acceptance rate (0.90-0.95 is ideal)
         target_acceptance = 0.92
         
@@ -639,12 +665,67 @@ class LLCCalibrator:
                   f"LLC={llc_mean:.3f}±{llc_std:.3f}")
         
         best_result = valid_results[0]
-        print(f"\n🏆 SELECTED BEST COMBINATION:")
+        print(f"\n🏆 SELECTED BEST COMBINATION (MALA METHOD):")
         print(f"   γ = {best_result['gamma']}")
         print(f"   ε = {best_result['epsilon']:.2e}")
         print(f"   β = {best_result['nbeta']:.3f}")
         print(f"   MALA acceptance = {best_result['mala_acceptance']:.3f}")
         print(f"   LLC mean = {best_result.get('llc_mean', 'N/A')}")
+        print(f"{'='*60}")
+        
+        return best_result
+    
+    def _select_multi_gamma_by_stability(self, all_results: List[Dict]) -> Dict[str, float]:
+        """Select best gamma result based on LLC stability (std/mean ratio)"""
+        
+        # Find results with stability data
+        valid_results = []
+        for result in all_results:
+            if 'llc_std_over_mean' in result and result['llc_std_over_mean'] is not None:
+                # Lower std/mean is better (more stable)
+                result['stability_score'] = abs(result['llc_std_over_mean'])
+                valid_results.append(result)
+        
+        if not valid_results:
+            print("⚠️  No results with stability data found, falling back to first successful result")
+            return all_results[0]
+        
+        # Sort by stability (lower std/mean is better)
+        valid_results.sort(key=lambda x: x['stability_score'])
+        
+        # Prefer positive LLC values if available
+        positive_llc_results = [r for r in valid_results if r.get('llc_mean', 0) > 0]
+        if positive_llc_results:
+            valid_results = positive_llc_results
+            print("✓ Found results with positive LLC values - prioritizing those")
+        else:
+            print("⚠️  No positive LLC values found - using all results")
+        
+        # Display comparison
+        print(f"Results ranked by LLC stability (lower std/mean is better):")
+        print("-" * 80)
+        for i, result in enumerate(valid_results):
+            gamma = result['gamma']
+            epsilon = result['epsilon']
+            beta = result['nbeta']
+            llc_mean = result.get('llc_mean', 'N/A')
+            llc_std = result.get('llc_std_over_mean', 'N/A')
+            mala_acc = result.get('mala_acceptance', 'N/A')
+            
+            marker = "🏆" if i == 0 else f" {i+1}."
+            print(f"{marker} γ={gamma:>6.0f}, ε={epsilon:.2e}, β={beta:>6.1f}, "
+                  f"LLC={llc_mean:.4f}±{llc_std:.4f}, "
+                  f"MALA={mala_acc:.3f}")
+        
+        best_result = valid_results[0]
+        print(f"\n🏆 SELECTED BEST COMBINATION (STABILITY METHOD):")
+        print(f"   γ = {best_result['gamma']}")
+        print(f"   ε = {best_result['epsilon']:.2e}")
+        print(f"   β = {best_result['nbeta']:.3f}")
+        print(f"   LLC mean = {best_result.get('llc_mean', 'N/A')}")
+        print(f"   LLC stability = {best_result.get('llc_std_over_mean', 'N/A')}")
+        if 'mala_acceptance' in best_result:
+            print(f"   MALA acceptance = {best_result['mala_acceptance']:.3f}")
         print(f"{'='*60}")
         
         return best_result
@@ -695,6 +776,7 @@ class LLCCalibrator:
                     hyperparams: Optional[Dict[str, float]] = None,
                     save_path: Optional[str] = None,
                     seed: Optional[int] = None,
+                    retrospective_gamma: Optional[float] = None,
         ) -> Dict[str, Any]:
         """
         Estimate LLC for a single model.
@@ -705,6 +787,9 @@ class LLCCalibrator:
             hyperparams: Optional hyperparameters (uses config defaults if None)
             save_path: Optional path to save diagnostic plots
             seed: Optional seed for reproducible sampling
+            retrospective_gamma: Optional override gamma for retrospective measurements
+                               (allows using smaller gamma for meaningful LLC variation
+                                while keeping calibrated gamma for stability)
             
         Returns:
             Dictionary containing LLC estimates and diagnostics
@@ -728,6 +813,13 @@ class LLCCalibrator:
                 "nbeta": self.config.nbeta or default_nbeta(train_loader)
             }
         
+        # Override gamma for retrospective measurements if provided
+        if retrospective_gamma is not None:
+            original_gamma = hyperparams.get("gamma", self.config.gamma)
+            hyperparams["gamma"] = retrospective_gamma
+            print(f"  🎯 Using retrospective gamma: {retrospective_gamma} (calibrated: {original_gamma})")
+            print(f"     This allows meaningful LLC variation while maintaining sampling quality")
+        
         print(f"Estimating LLC with hyperparams: {hyperparams}")
         print(f"  Model device: {next(model.parameters()).device}")
         print(f"  Target device: {self.device}")
@@ -747,6 +839,21 @@ class LLCCalibrator:
         # CRITICAL: Ensure all parameters require gradients
         for param in model.parameters():
             param.requires_grad_(True)
+        
+        # # CRITICAL DEBUG: Check total parameter count first
+        # total_params = sum(p.numel() for p in model.parameters())
+        # print(f"  🔍 DEBUG: Total parameters in model: {total_params:,}")
+        
+        # # Check parameter list
+        # param_list = list(model.parameters())
+        # print(f"  🔍 DEBUG: Number of parameter tensors: {len(param_list)}")
+        
+        # # Show parameter shapes for debugging
+        # print("  🔍 DEBUG: First 5 parameter shapes:")
+        # for i, (name, param) in enumerate(model.named_parameters()):
+        #     print(f"    {i}: {name} -> {param.shape} ({param.numel():,} params)")
+        #     if i >= 4:  # Show only first 5
+        #         break
         
         # Verify gradient setup
         grad_params = [p for p in model.parameters() if p.requires_grad]

@@ -33,7 +33,8 @@ def config_resnet18_cifar10():
 
     config.train_batch_size = 256
     config.test_batch_size = 2048
-    config.num_steps = 500000                       # number of training steps
+    # config.num_steps = 500000                       # number of training steps
+    config.num_steps = 5000000                       # number of training steps
     config.weight_decay = 0.
     config.label_smoothing = 0.
     config.log_steps = np.unique(np.logspace(0,5.7,50).astype(int).clip(0,config.num_steps))

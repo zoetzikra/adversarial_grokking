@@ -1,0 +1,29 @@
+{
+  "num_calibrated": 2,
+  "step_range": {
+    "min": 383418,
+    "max": 500000
+  },
+  "tuning_info": {
+    "epsilon_tuned": true,
+    "gamma_tuned": false,
+    "nbeta_tuned": false,
+    "selection_method": "stability",
+    "note": "Only epsilon is optimized via EpsilonBetaAnalyzer. Gamma and nbeta are fixed."
+  },
+  "epsilon_stats": {
+    "mean": 5.0499999999999994e-05,
+    "std": 4.95e-05,
+    "min": 1e-06,
+    "max": 9.999999999999999e-05,
+    "median": 5.0499999999999994e-05
+  },
+  "gamma_stats": {
+    "value": 50000.0,
+    "note": "Fixed value, not tuned"
+  },
+  "nbeta_stats": {
+    "value": 0.8207331788168325,
+    "note": "Default value from devinterp, not tuned"
+  }
+}

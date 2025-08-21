@@ -59,6 +59,8 @@ def main():
                        help='Enable verbose output during LLC estimation')
     parser.add_argument('--skip_existing', action='store_true',
                        help='Skip checkpoints that already have results')
+    parser.add_argument('--retrospective_gamma', type=float, default=None,
+                       help='Override gamma for retrospective LLC measurements (allows smaller gamma for meaningful variation)')
     args = parser.parse_args()
     
     # Setup output directory
@@ -73,6 +75,9 @@ def main():
     print(f"Parameter lookup: {args.parameter_lookup}")
     print(f"Output directory: {args.output_dir}")
     print(f"Device: {args.device}")
+    if args.retrospective_gamma is not None:
+        print(f"🎯 Retrospective gamma override: {args.retrospective_gamma}")
+        print(f"   (Will use this instead of calibrated gamma for LLC measurements)")
     print("=" * 80)
     
     # Load parameter lookup table
@@ -181,7 +186,8 @@ def main():
                 model, 
                 train_loader,  # Use full train_loader for consistency
                 hyperparams=nearest_params,
-                seed=42  # Fixed seed for reproducibility
+                seed=42,  # Fixed seed for reproducibility
+                retrospective_gamma=args.retrospective_gamma  # Override gamma for retrospective measurement
             )
             
             # Extract results
@@ -328,7 +334,7 @@ def save_results(results, output_dir, intermediate=False):
             print("❌ Could not save backup either")
 
 def create_summary_plot(df, output_dir):
-    """Create summary visualization of LLC evolution with parameter annotations"""
+    """Create summary visualization of LLC evolution"""
     
     # Filter successful results
     successful_df = df[df.get('success', True) == True].copy()
@@ -342,10 +348,10 @@ def create_summary_plot(df, output_dir):
         print("⚠️  No valid LLC values to plot")
         return
     
-    # Create plot
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 12))
+    # Create plot with single subplot
+    fig, ax1 = plt.subplots(1, 1, figsize=(15, 8))
     
-    # LLC evolution with parameter source annotation
+    # LLC evolution
     ax1.semilogx(plot_df['step'], plot_df['llc_mean'], 'o-', color='blue', linewidth=2, markersize=4)
     if 'llc_std' in plot_df.columns:
         ax1.fill_between(plot_df['step'], 
@@ -360,31 +366,10 @@ def create_summary_plot(df, output_dir):
                    color='red', s=100, marker='*', label='Calibrated checkpoints', zorder=5)
     
     ax1.set_xlabel('Training Step')
-    ax1.set_ylabel('Local Learning Coefficient')
-    ax1.set_title('LLC Evolution (Nearest-Neighbor Parameters)')
+    ax1.set_ylabel('Mean Local Learning Coefficient')
+    ax1.set_title('LLC Evolution')
     ax1.grid(True, alpha=0.3)
     ax1.legend()
-    
-    # Parameter usage visualization
-    if 'nearest_calibrated_step' in plot_df.columns:
-        # Color code by which calibrated checkpoint was used
-        unique_sources = sorted(plot_df['nearest_calibrated_step'].unique())
-        colors = plt.cm.tab10(np.linspace(0, 1, len(unique_sources)))
-        
-        for i, source_step in enumerate(unique_sources):
-            if np.isnan(source_step):
-                continue
-            mask = plot_df['nearest_calibrated_step'] == source_step
-            subset = plot_df[mask]
-            ax2.semilogx(subset['step'], [source_step] * len(subset), 'o', 
-                        color=colors[i], label=f'Uses params from step {int(source_step)}',
-                        markersize=3, alpha=0.7)
-        
-        ax2.set_xlabel('Training Step')
-        ax2.set_ylabel('Parameter Source Step')
-        ax2.set_title('Which Calibrated Parameters Were Used')
-        ax2.grid(True, alpha=0.3)
-        ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
     plt.tight_layout()
     plot_path = os.path.join(output_dir, 'llc_nearest_neighbor_summary.png')

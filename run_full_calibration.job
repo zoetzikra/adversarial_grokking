@@ -3,7 +3,7 @@
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=8
 #SBATCH --job-name=adversarial_grokking_ffcv
-#SBATCH --output=RunMethod_%A_h100_test_test_mala_calibration.out
+#SBATCH --output=RunMethod_%A_h100_test_full_calibration_beta_tuned_stability.out
 #SBATCH --time=12:00:00
 #SBATCH --mem=40G
 #SBATCH --hint=nomultithread
@@ -34,13 +34,21 @@ CHECKPOINT_DIR="/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025"
 # echo "Checkpoint directory: $CHECKPOINT_DIR"
 # echo "Key checkpoints: 8, 24, 55, 94, 162, 473, 809, 1382, 3088, 9017, 15408, 26327, 58801, 100417, 131331, 224398, 383418, 500000"
 
+# python llc_hybrid_calibration.py \
+#     --checkpoint_dir "$CHECKPOINT_DIR" \
+#     --output_dir "./llc_full_calibration_results" \
+#     --device cuda \
+#     --gamma_values 10000 20000 50000 80000 \
+#     --use_tuned_beta True
+
+
 python llc_hybrid_calibration.py \
     --checkpoint_dir "$CHECKPOINT_DIR" \
     --output_dir "./llc_full_calibration_results" \
     --device cuda \
     --gamma_values 1000 5000 10000 \
+    --selection_method stability \
     --use_tuned_beta True
-
 
 echo "Full calibration completed at: $(date)"
 
