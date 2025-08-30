@@ -21,7 +21,32 @@ module load CUDA/12.1.1
 source activate devinterp_env
 
 
-python create_paper_style_comparison.py
+# python create_paper_style_comparison.py \
+#     --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+#     --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv \
+#     --output_dir /home/ztzifa/grok-adversarial
+
+python create_paper_style_comparison.py \
+    --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+    --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv \
+    --loss_llc_comparison \
+    --output_dir /home/ztzifa/grok-adversarial \
+    --zoomed_in
+
+python create_paper_style_comparison.py \
+    --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+    --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results_adversarial/llc_nearest_neighbor_results.csv \
+    --loss_llc_comparison \
+    --output_dir /home/ztzifa/grok-adversarial
+
+
+
+# python create_paper_style_comparison.py \
+#     --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+#     --llc_clean /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv \
+#     --llc_adversarial /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results_adversarial/llc_nearest_neighbor_results.csv \
+#     --clean_vs_adversarial \
+#     --output_dir /home/ztzifa/grok-adversarial
 
 
 echo "Analysis completed! At $(date)"

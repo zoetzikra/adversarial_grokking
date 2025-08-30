@@ -8,6 +8,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import re
+import argparse
+import os
 from datetime import datetime
 
 def extract_tensor_values(series):
@@ -29,16 +31,16 @@ def extract_tensor_values(series):
     
     return series.apply(extract_value)
 
-def create_paper_style_comparison():
+def create_paper_style_comparison(train_stats_path, llc_results_path, output_dir):
     """Create comparison plots in paper style"""
     
     # Load training statistics
-    print("Loading training statistics...")
-    train_stats = pd.read_csv('/home/ztzifa/grok-adversarial/analysis_output/training_stats.csv')
+    print(f"Loading training statistics from: {train_stats_path}")
+    train_stats = pd.read_csv(train_stats_path)
     
     # Load LLC results
-    print("Loading LLC results...")
-    llc_stats = pd.read_csv('/home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv')
+    print(f"Loading LLC results from: {llc_results_path}")
+    llc_stats = pd.read_csv(llc_results_path)
     
     # Clean training data - extract values from tensor strings
     print("Processing training data...")
@@ -175,7 +177,8 @@ def create_paper_style_comparison():
     
     # Save the plot with timestamp to avoid overwriting
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = f'/home/ztzifa/grok-adversarial/paper_style_comparison_{timestamp}.png'
+    output_path = os.path.join(output_dir, f'paper_style_comparison_{timestamp}.png')
+    os.makedirs(output_dir, exist_ok=True)
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"✅ Paper-style comparison plot saved to: {output_path}")
     
@@ -202,12 +205,14 @@ def create_paper_style_comparison():
     
     return fig
 
-def create_detailed_analysis():
+def create_detailed_analysis(train_stats_path, llc_results_path, output_dir):
     """Create additional detailed analysis plots"""
     
     # Load data
-    train_stats = pd.read_csv('/home/ztzifa/grok-adversarial/analysis_output/training_stats.csv')
-    llc_stats = pd.read_csv('/home/ztzifa/grok-adversarial/llc_full_calibration_results/retrospective_results/llc_nearest_neighbor_results.csv')
+    print(f"Loading training statistics from: {train_stats_path}")
+    train_stats = pd.read_csv(train_stats_path)
+    print(f"Loading LLC results from: {llc_results_path}")
+    llc_stats = pd.read_csv(llc_results_path)
     
     # Process data
     train_stats['test_acc_clean'] = extract_tensor_values(train_stats['test_acc']) * 100
@@ -285,27 +290,703 @@ def create_detailed_analysis():
     
     # Save detailed analysis with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = f'/home/ztzifa/grok-adversarial/detailed_analysis_{timestamp}.png'
+    output_path = os.path.join(output_dir, f'detailed_analysis_{timestamp}.png')
+    os.makedirs(output_dir, exist_ok=True)
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"✅ Detailed analysis saved to: {output_path}")
     
     return fig
 
-if __name__ == '__main__':
-    print("Creating paper-style comparison plots...")
-    print("="*60)
+def create_clean_vs_adversarial_comparison(train_stats_path, llc_clean_path, llc_adversarial_path, output_dir):
+    """Create comparison between clean and adversarial trajectories"""
     
-    # Create main comparison
-    fig1 = create_paper_style_comparison()
+    # Load data
+    print(f"Loading training statistics from: {train_stats_path}")
+    train_stats = pd.read_csv(train_stats_path)
     
-    print("\nCreating detailed analysis...")
-    fig2 = create_detailed_analysis()
+    print(f"Loading clean LLC results from: {llc_clean_path}")
+    llc_clean = pd.read_csv(llc_clean_path)
     
+    print(f"Loading adversarial LLC results from: {llc_adversarial_path}")
+    llc_adversarial = pd.read_csv(llc_adversarial_path)
+    
+    # Process data
+    train_stats['test_acc_clean'] = extract_tensor_values(train_stats['test_acc']) * 100
+    train_stats['adv_acc_clean'] = extract_tensor_values(train_stats['adv_acc']) * 100
+    
+    # Filter successful LLC results
+    llc_clean_success = llc_clean[llc_clean['success'] == True].copy()
+    llc_adversarial_success = llc_adversarial[llc_adversarial['success'] == True].copy()
+    
+    # Create figure with 2x2 subplots
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 10))
+    
+    # Set styling
+    plt.rcParams.update({
+        'font.size': 12,
+        'axes.linewidth': 1,
+        'axes.labelsize': 12,
+        'xtick.labelsize': 10,
+        'ytick.labelsize': 10,
+        'legend.fontsize': 10,
+        'figure.dpi': 100
+    })
+    
+    # Plot 1: Test Accuracy Comparison (top left)
+    ax1.semilogx(train_stats['step'], train_stats['test_acc_clean'], 
+                 '-', color='#2E8B57', linewidth=2, label='Clean Test Acc')
+    ax1.semilogx(train_stats['step'], train_stats['adv_acc_clean'], 
+                 '-', color='#DC143C', linewidth=2, label='Adversarial Test Acc')
+    
+    ax1.set_xlabel('Optimization Steps')
+    ax1.set_ylabel('Test Accuracy (%)')
+    ax1.set_title('Clean vs Adversarial Test Accuracy')
+    ax1.legend(loc='upper right')
+    ax1.grid(True, alpha=0.3)
+    ax1.set_ylim(0, 80)
+    ax1.set_xlim(1e0, 5e5)
+    
+    # Plot 2: LLC Comparison (top right)
+    if len(llc_clean_success) > 0:
+        ax2.semilogx(llc_clean_success['step'], llc_clean_success['llc_mean'], 
+                     'o-', color='#2E8B57', linewidth=2, markersize=4, 
+                     label='LLC on Clean Data', alpha=0.8)
+        
+        # Add error bars for clean LLC
+        if 'llc_std' in llc_clean_success.columns and not llc_clean_success['llc_std'].isna().all():
+            valid_clean = llc_clean_success.dropna(subset=['llc_std'])
+            if len(valid_clean) > 0:
+                ax2.fill_between(valid_clean['step'], 
+                               valid_clean['llc_mean'] - valid_clean['llc_std'],
+                               valid_clean['llc_mean'] + valid_clean['llc_std'],
+                               alpha=0.2, color='#2E8B57')
+    
+    if len(llc_adversarial_success) > 0:
+        ax2.semilogx(llc_adversarial_success['step'], llc_adversarial_success['llc_mean'], 
+                     's-', color='#DC143C', linewidth=2, markersize=4, 
+                     label='LLC on Adversarial Data', alpha=0.8)
+        
+        # Add error bars for adversarial LLC
+        if 'llc_std' in llc_adversarial_success.columns and not llc_adversarial_success['llc_std'].isna().all():
+            valid_adv = llc_adversarial_success.dropna(subset=['llc_std'])
+            if len(valid_adv) > 0:
+                ax2.fill_between(valid_adv['step'], 
+                               valid_adv['llc_mean'] - valid_adv['llc_std'],
+                               valid_adv['llc_mean'] + valid_adv['llc_std'],
+                               alpha=0.2, color='#DC143C')
+    
+    ax2.set_xlabel('Optimization Steps')
+    ax2.set_ylabel('Local Learning Coefficient')
+    ax2.set_title('LLC: Clean vs Adversarial Data')
+    ax2.legend(loc='upper right')
+    ax2.grid(True, alpha=0.3)
+    ax2.set_xlim(1e0, 5e5)
+    
+    # Plot 3: Combined Normalized Comparison (bottom left)
+    # Normalize accuracies to [0, 1] for comparison
+    test_acc_norm = train_stats['test_acc_clean'] / 100.0
+    adv_acc_norm = train_stats['adv_acc_clean'] / 100.0
+    
+    ax3.semilogx(train_stats['step'], test_acc_norm, 
+                 '-', color='#2E8B57', linewidth=2, label='Clean Test Acc (norm)')
+    ax3.semilogx(train_stats['step'], adv_acc_norm, 
+                 '-', color='#DC143C', linewidth=2, label='Adv Test Acc (norm)')
+    
+    # Normalize LLC values if available
+    if len(llc_clean_success) > 0:
+        llc_clean_norm = (llc_clean_success['llc_mean'] - llc_clean_success['llc_mean'].min()) / \
+                        (llc_clean_success['llc_mean'].max() - llc_clean_success['llc_mean'].min())
+        ax3.semilogx(llc_clean_success['step'], llc_clean_norm, 
+                     'o-', color='#228B22', linewidth=2, markersize=3, 
+                     label='LLC Clean (norm)', alpha=0.7)
+    
+    if len(llc_adversarial_success) > 0:
+        llc_adv_norm = (llc_adversarial_success['llc_mean'] - llc_adversarial_success['llc_mean'].min()) / \
+                      (llc_adversarial_success['llc_mean'].max() - llc_adversarial_success['llc_mean'].min())
+        ax3.semilogx(llc_adversarial_success['step'], llc_adv_norm, 
+                     's-', color='#B22222', linewidth=2, markersize=3, 
+                     label='LLC Adv (norm)', alpha=0.7)
+    
+    ax3.set_xlabel('Optimization Steps')
+    ax3.set_ylabel('Normalized Values')
+    ax3.set_title('Normalized Comparison: Accuracy vs LLC')
+    ax3.legend(loc='upper right')
+    ax3.grid(True, alpha=0.3)
+    ax3.set_xlim(1e0, 5e5)
+    ax3.set_ylim(0, 1)
+    
+    # Plot 4: LLC Difference Analysis (bottom right)
+    if len(llc_clean_success) > 0 and len(llc_adversarial_success) > 0:
+        # Interpolate to common steps for difference calculation
+        common_steps = np.intersect1d(llc_clean_success['step'], llc_adversarial_success['step'])
+        if len(common_steps) > 0:
+            clean_interp = llc_clean_success.set_index('step').loc[common_steps, 'llc_mean']
+            adv_interp = llc_adversarial_success.set_index('step').loc[common_steps, 'llc_mean']
+            
+            llc_difference = adv_interp.values - clean_interp.values
+            
+            ax4.semilogx(common_steps, llc_difference, 
+                        'o-', color='#4B0082', linewidth=2, markersize=4, 
+                        label='LLC(Adv) - LLC(Clean)')
+            ax4.axhline(y=0, color='black', linestyle='--', alpha=0.5)
+            
+            ax4.set_xlabel('Optimization Steps')
+            ax4.set_ylabel('LLC Difference')
+            ax4.set_title('LLC Difference: Adversarial - Clean')
+            ax4.legend(loc='upper right')
+            ax4.grid(True, alpha=0.3)
+            ax4.set_xlim(1e0, 5e5)
+        else:
+            ax4.text(0.5, 0.5, 'No overlapping steps\nbetween clean and\nadversarial LLC data', 
+                    transform=ax4.transAxes, ha='center', va='center', fontsize=12)
+            ax4.set_title('LLC Difference: Adversarial - Clean')
+    else:
+        ax4.text(0.5, 0.5, 'Insufficient LLC data\nfor difference analysis', 
+                transform=ax4.transAxes, ha='center', va='center', fontsize=12)
+        ax4.set_title('LLC Difference: Adversarial - Clean')
+    
+    plt.tight_layout()
+    
+    # Save the plot
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = os.path.join(output_dir, f'clean_vs_adversarial_comparison_{timestamp}.png')
+    os.makedirs(output_dir, exist_ok=True)
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Clean vs Adversarial comparison plot saved to: {output_path}")
+    
+    # Print statistics
     print("\n" + "="*60)
-    print("ANALYSIS COMPLETE")
+    print("CLEAN VS ADVERSARIAL COMPARISON STATISTICS")
     print("="*60)
-    print("Generated files:")
-    print("  - paper_style_comparison_[timestamp].png: Main comparison in paper style")
-    print("  - detailed_analysis_[timestamp].png: Additional detailed analysis")
+    
+    print(f"Training data points: {len(train_stats)}")
+    print(f"Clean LLC data points: {len(llc_clean_success)}")
+    print(f"Adversarial LLC data points: {len(llc_adversarial_success)}")
+    
+    if len(train_stats) > 0:
+        print(f"\nTest Accuracy ranges:")
+        print(f"  Clean: {train_stats['test_acc_clean'].min():.1f}% - {train_stats['test_acc_clean'].max():.1f}%")
+        print(f"  Adversarial: {train_stats['adv_acc_clean'].min():.1f}% - {train_stats['adv_acc_clean'].max():.1f}%")
+    
+    if len(llc_clean_success) > 0:
+        print(f"\nClean LLC range: {llc_clean_success['llc_mean'].min():.3f} - {llc_clean_success['llc_mean'].max():.3f}")
+    
+    if len(llc_adversarial_success) > 0:
+        print(f"Adversarial LLC range: {llc_adversarial_success['llc_mean'].min():.3f} - {llc_adversarial_success['llc_mean'].max():.3f}")
+    
+    return fig
+
+def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, zoomed_in=False, log_scale=False):
+    """Create comparison between train/test loss and LLC trajectory"""
+    
+    # Load data
+    print(f"Loading training statistics from: {train_stats_path}")
+    train_stats = pd.read_csv(train_stats_path)
+    
+    print(f"Loading LLC results from: {llc_results_path}")
+    llc_stats = pd.read_csv(llc_results_path)
+    
+    # Detect if this is adversarial results based on path (excluding base directory name)
+    import os
+    # Remove the base directory name to avoid false positives from "grok-adversarial"
+    path_parts = llc_results_path.split(os.sep)
+    # Look for "adversarial" in directory names or filename, but skip the first few parts that might contain "grok-adversarial"
+    relevant_path = os.sep.join(path_parts[-3:]).lower()  # Last 3 parts of path
+    is_adversarial = "adversarial" in relevant_path and "grok-adversarial" not in relevant_path
+    print(f"Detected {'adversarial' if is_adversarial else 'clean'} LLC results based on path: {relevant_path}")
+    
+    # Process data
+    train_stats['train_loss_clean'] = extract_tensor_values(train_stats['train_loss'])
+    train_stats['test_loss_clean'] = extract_tensor_values(train_stats['test_loss'])
+    train_stats['test_acc_clean'] = extract_tensor_values(train_stats['test_acc']) * 100
+    
+    # Debug: Print data ranges
+    print(f"Train loss range: {train_stats['train_loss_clean'].min():.4f} - {train_stats['train_loss_clean'].max():.4f}")
+    print(f"Test loss range: {train_stats['test_loss_clean'].min():.4f} - {train_stats['test_loss_clean'].max():.4f}")
+    print(f"Test accuracy range: {train_stats['test_acc_clean'].min():.2f}% - {train_stats['test_acc_clean'].max():.2f}%")
+    
+    # Process adversarial accuracy if available
+    if is_adversarial and 'adv_acc' in train_stats.columns:
+        train_stats['adv_acc_clean'] = extract_tensor_values(train_stats['adv_acc']) * 100
+        print("Found adversarial accuracy data - will plot adversarial robustness instead of test loss")
+    
+    # Filter successful LLC results
+    llc_success = llc_stats[llc_stats['success'] == True].copy()
+    
+    # Debug: Print LLC data info
+    print(f"Total LLC entries: {len(llc_stats)}")
+    print(f"Successful LLC entries: {len(llc_success)}")
+    if len(llc_success) > 0:
+        print(f"LLC step range: {llc_success['step'].min()} - {llc_success['step'].max()}")
+        print(f"LLC mean range: {llc_success['llc_mean'].min():.4f} - {llc_success['llc_mean'].max():.4f}")
+    
+    # Detect grokking phase (same logic as in detailed_analysis)
+    grok_threshold = 70  # Define grokking as >70% test accuracy
+    grok_mask = train_stats['test_acc_clean'] > grok_threshold
+    grok_start = train_stats[grok_mask]['step'].min() if grok_mask.any() else None
+    
+    # Create figure with 2x2 subplots
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 10))
+    
+    # Set styling
+    plt.rcParams.update({
+        'font.size': 12,
+        'axes.linewidth': 1,
+        'axes.labelsize': 12,
+        'xtick.labelsize': 10,
+        'ytick.labelsize': 10,
+        'legend.fontsize': 10,
+        'figure.dpi': 100
+    })
+    
+    # Plot 1: Loss/Accuracy Evolution (top left)
+    if log_scale:
+        # Use loglog for both x and y axes when log_scale=True
+        ax1.loglog(train_stats['step'], train_stats['train_loss_clean'], 
+                   '-', color='#1f77b4', linewidth=2, label='Train Loss')
+    else:
+        # Use semilogx (log x-axis, linear y-axis) as before
+        ax1.semilogx(train_stats['step'], train_stats['train_loss_clean'], 
+                     '-', color='#1f77b4', linewidth=2, label='Train Loss')
+    
+    if is_adversarial and 'adv_acc_clean' in train_stats.columns:
+        # Create dual y-axis for adversarial accuracy
+        ax1_twin = ax1.twinx()
+        if log_scale:
+            # For adversarial accuracy, we can't use log scale since it includes 0-100%
+            # So we use semilogx (log x-axis only)
+            ax1_twin.semilogx(train_stats['step'], train_stats['adv_acc_clean'], 
+                             '-', color='#ff7f0e', linewidth=2, label='Adversarial Accuracy')
+        else:
+            ax1_twin.semilogx(train_stats['step'], train_stats['adv_acc_clean'], 
+                             '-', color='#ff7f0e', linewidth=2, label='Adversarial Accuracy')
+        ax1.set_ylabel('Train Loss', color='#1f77b4')
+        ax1_twin.set_ylabel('Adversarial Accuracy (%)', color='#ff7f0e')
+        ax1.set_title('Train Loss vs Adversarial Robustness' + (' (Log Scale)' if log_scale else ''))
+        
+        # Set y-axis limits
+        if log_scale:
+            # For log scale, ensure we don't include zero or negative values
+            min_loss = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0].min()
+            max_loss = train_stats['train_loss_clean'].max()
+            ax1.set_ylim(min_loss * 0.5, max_loss * 2)
+        else:
+            ax1.set_ylim(0, train_stats['train_loss_clean'].max() * 1.1)
+        ax1_twin.set_ylim(0, 100)
+        
+        # Combine legends
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax1_twin.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+    else:
+        # Standard test loss plot
+        if log_scale:
+            ax1.loglog(train_stats['step'], train_stats['test_loss_clean'], 
+                       '-', color='#ff7f0e', linewidth=2, label='Test Loss')
+        else:
+            ax1.semilogx(train_stats['step'], train_stats['test_loss_clean'], 
+                         '-', color='#ff7f0e', linewidth=2, label='Test Loss')
+        ax1.set_ylabel('Loss')
+        ax1.set_title('Train vs Test Loss Evolution' + (' (Log Scale)' if log_scale else ''))
+        ax1.legend(loc='upper right')
+        # Set y-axis to show the actual range of loss values
+        if log_scale:
+            # For log scale, ensure we don't include zero or negative values
+            train_loss_pos = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0]
+            test_loss_pos = train_stats['test_loss_clean'][train_stats['test_loss_clean'] > 0]
+            min_loss = min(train_loss_pos.min(), test_loss_pos.min()) if len(train_loss_pos) > 0 and len(test_loss_pos) > 0 else 1e-6
+            max_loss = max(train_stats['train_loss_clean'].max(), train_stats['test_loss_clean'].max())
+            ax1.set_ylim(min_loss * 0.5, max_loss * 2)
+            print(f"Setting log scale y-axis limit to: {min_loss * 0.5:.6f} - {max_loss * 2:.4f}")
+        elif zoomed_in:
+            # Zoomed in view: focus on 0-10 range for better detail
+            ax1.set_ylim(-0.2, 10)
+            print(f"Setting zoomed y-axis limit to: -0.2 - 10")
+        else:
+            # Normal view: use full data range
+            max_loss = max(train_stats['train_loss_clean'].max(), train_stats['test_loss_clean'].max())
+            min_y = -max_loss * 0.02  # Show 2% of max loss below zero for better visibility
+            ax1.set_ylim(min_y, max_loss * 1.1)
+            print(f"Setting y-axis limit to: {min_y:.4f} - {max_loss * 1.1:.4f}")
+    
+    ax1.set_xlabel('Optimization Steps')
+    ax1.grid(True, alpha=0.3)
+    ax1.set_xlim(1e0, 5e5)
+    
+    # Add grokking indicator
+    if grok_start:
+        ax1.axvline(grok_start, color='green', linestyle='--', alpha=0.7, 
+                   label=f'Grokking starts (~{grok_start})')
+        ax1.legend(loc='upper right')
+    
+    # Plot 2: LLC Evolution (top right)
+    if len(llc_success) > 0:
+        ax2.semilogx(llc_success['step'], llc_success['llc_mean'], 
+                     'o-', color='#2ca02c', linewidth=2, markersize=4, 
+                     label='LLC', alpha=0.8)
+        
+        # Add error bars if std is available
+        if 'llc_std' in llc_success.columns and not llc_success['llc_std'].isna().all():
+            valid_std = llc_success.dropna(subset=['llc_std'])
+            if len(valid_std) > 0:
+                ax2.fill_between(valid_std['step'], 
+                               valid_std['llc_mean'] - valid_std['llc_std'],
+                               valid_std['llc_mean'] + valid_std['llc_std'],
+                               alpha=0.2, color='#2ca02c')
+    
+    ax2.set_xlabel('Optimization Steps')
+    ax2.set_ylabel('Local Learning Coefficient')
+    ax2.set_title('LLC Evolution')
+    ax2.legend(loc='upper right')
+    ax2.grid(True, alpha=0.3)
+    ax2.set_xlim(1e0, 5e5)
+    
+    # Add grokking indicator
+    if grok_start:
+        ax2.axvline(grok_start, color='green', linestyle='--', alpha=0.7, 
+                   label=f'Grokking starts (~{grok_start})')
+        ax2.legend(loc='upper right')
+    
+    # Plot 3: Combined Loss and LLC (bottom left)
+    # Use dual y-axis to show both loss and LLC
+    ax3_twin = ax3.twinx()
+    
+    # Plot train loss and test loss/adversarial accuracy on left y-axis
+    if log_scale:
+        line1 = ax3.loglog(train_stats['step'], train_stats['train_loss_clean'], 
+                          '-', color='#1f77b4', linewidth=2, label='Train Loss')
+    else:
+        line1 = ax3.semilogx(train_stats['step'], train_stats['train_loss_clean'], 
+                            '-', color='#1f77b4', linewidth=2, label='Train Loss')
+    
+    if is_adversarial and 'adv_acc_clean' in train_stats.columns:
+        # For adversarial results, plot adversarial accuracy instead of test loss
+        # Adversarial accuracy can't use log y-axis since it includes 0-100%
+        line2 = ax3.semilogx(train_stats['step'], train_stats['adv_acc_clean'], 
+                            '-', color='#ff7f0e', linewidth=2, label='Adversarial Accuracy')
+        ax3.set_ylabel('Train Loss / Adversarial Accuracy (%)', color='black')
+        title_suffix = ' (Log Scale)' if log_scale else ''
+        ax3.set_title('Train Loss, Adversarial Accuracy and LLC' + title_suffix)
+        # Set y-axis to accommodate both loss and accuracy (0-100%)
+        if log_scale:
+            # For log scale, set train loss axis appropriately
+            min_loss = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0].min()
+            max_loss = train_stats['train_loss_clean'].max()
+            ax3.set_ylim(min_loss * 0.5, max(max_loss * 2, 100))
+            print(f"Setting combined plot log scale y-axis limit to: {min_loss * 0.5:.6f} - {max(max_loss * 2, 100):.4f} (adversarial mode)")
+        elif zoomed_in:
+            ax3.set_ylim(0, 10)
+            print(f"Setting combined plot zoomed y-axis limit to: 0 - 10 (adversarial mode)")
+        else:
+            max_loss = train_stats['train_loss_clean'].max() * 1.1
+            ax3.set_ylim(0, max(max_loss, 100))
+    else:
+        # Standard test loss plot
+        if log_scale:
+            line2 = ax3.loglog(train_stats['step'], train_stats['test_loss_clean'], 
+                              '-', color='#ff7f0e', linewidth=2, label='Test Loss')
+        else:
+            line2 = ax3.semilogx(train_stats['step'], train_stats['test_loss_clean'], 
+                                '-', color='#ff7f0e', linewidth=2, label='Test Loss')
+        ax3.set_ylabel('Loss', color='black')
+        title_suffix = ' (Log Scale)' if log_scale else ''
+        ax3.set_title('Loss and LLC Combined' + title_suffix)
+        # Set y-axis to show the actual range of loss values
+        if log_scale:
+            # For log scale, ensure we don't include zero or negative values
+            train_loss_pos = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0]
+            test_loss_pos = train_stats['test_loss_clean'][train_stats['test_loss_clean'] > 0]
+            min_loss = min(train_loss_pos.min(), test_loss_pos.min()) if len(train_loss_pos) > 0 and len(test_loss_pos) > 0 else 1e-6
+            max_loss = max(train_stats['train_loss_clean'].max(), train_stats['test_loss_clean'].max())
+            ax3.set_ylim(min_loss * 0.5, max_loss * 2)
+            print(f"Setting combined plot log scale y-axis limit to: {min_loss * 0.5:.6f} - {max_loss * 2:.4f}")
+        elif zoomed_in:
+            ax3.set_ylim(0, 10)
+            print(f"Setting combined plot zoomed y-axis limit to: 0 - 10")
+        else:
+            max_loss = max(train_stats['train_loss_clean'].max(), train_stats['test_loss_clean'].max())
+            ax3.set_ylim(0, max_loss * 1.1)
+            print(f"Setting combined plot y-axis limit to: 0 - {max_loss * 1.1:.4f}")
+    
+    # Plot LLC on right y-axis
+    if len(llc_success) > 0:
+        line3 = ax3_twin.semilogx(llc_success['step'], llc_success['llc_mean'], 
+                                 'o-', color='#2ca02c', linewidth=2, markersize=3, 
+                                 label='LLC', alpha=0.8)
+    
+    ax3.set_xlabel('Optimization Steps')
+    ax3_twin.set_ylabel('Local Learning Coefficient', color='#2ca02c')
+    ax3.grid(True, alpha=0.3)
+    ax3.set_xlim(1e0, 5e5)  # Cut off x-axis at 10^4
+    
+    # Set LLC y-axis to align zero points horizontally with the loss axis
+    if len(llc_success) > 0:
+        llc_min = llc_success['llc_mean'].min()
+        llc_max = llc_success['llc_mean'].max()
+        llc_range = llc_max - llc_min
+        padding = llc_range * 0.1 if llc_range > 0 else abs(llc_max) * 0.1
+        
+        # Set LLC y-axis limits with optional zoomed view
+        if zoomed_in:
+            # Zoomed view: focus on 0-10 range for LLC as well
+            # Use a small tolerance to treat near-zero values as zero
+            tolerance = 0.1  # Values within 0.1 of zero are considered zero
+            if llc_min >= -tolerance:
+                # LLC data is essentially all positive, start from 0 to align with loss axis
+                print(f"LLC data is essentially positive: min={llc_min:.3f}, max={llc_max:.3f} (tolerance={tolerance})")
+                ax3_twin.set_ylim(0, 10)
+                print(f"Set LLC y-axis to (0, 10), actual limits: {ax3_twin.get_ylim()}")
+                # Force the limits to stick
+                ax3_twin.set_ylim(0, 10)
+                print(f"After forcing again, actual limits: {ax3_twin.get_ylim()}")
+            else:
+                # If LLC has significant negative values, include the negative range
+                print(f"LLC data has significant negative values: min={llc_min:.3f}, max={llc_max:.3f}")
+                ax3_twin.set_ylim(min(llc_min - padding, -2), 10)
+                print(f"Setting LLC zoomed y-axis limits to: {ax3_twin.get_ylim()}")
+        else:
+            # Normal view: align zero points horizontally
+            if llc_min >= 0:
+                # LLC data is all positive, start from 0 to align with loss axis
+                ax3_twin.set_ylim(0, llc_max + padding)
+            else:
+                # LLC has negative values, but we still want to align the zero points
+                ax3_twin.set_ylim(llc_min - padding, max(0, llc_max + padding))
+            print(f"Setting LLC y-axis limits to: {ax3_twin.get_ylim()}")
+    else:
+        ax3_twin.set_ylim(0, 30)  # Fallback if no LLC data
+    
+    # Combine legends
+    lines = line1 + line2
+    labels = [l.get_label() for l in lines]
+    if len(llc_success) > 0:
+        lines += line3
+        labels += [line3[0].get_label()]
+    
+    # Add grokking indicator
+    if grok_start:
+        ax3.axvline(grok_start, color='green', linestyle='--', alpha=0.7, 
+                   label=f'Grokking starts (~{grok_start})')
+        labels.append(f'Grokking starts (~{grok_start})')
+    
+    ax3.legend(lines, labels, loc='upper right')
+    
+    # Final enforcement of axis limits (in case matplotlib adjusted them)
+    if zoomed_in and len(llc_success) > 0:
+        llc_min = llc_success['llc_mean'].min()
+        tolerance = 0.1  # Same tolerance as above
+        if llc_min >= -tolerance:
+            print(f"Final enforcement: Setting LLC y-axis to (0, 10) for essentially positive data (min={llc_min:.3f})")
+            ax3_twin.set_ylim(0, 10)
+            print(f"Final LLC y-axis limits: {ax3_twin.get_ylim()}")
+    
+    # Plot 4: Loss/Accuracy vs LLC Correlation (bottom right)
+    if len(llc_success) > 0:
+        # Interpolate LLC values to match training steps
+        llc_interp = np.interp(train_stats['step'], llc_success['step'], llc_success['llc_mean'])
+        
+        if is_adversarial and 'adv_acc_clean' in train_stats.columns:
+            # Create scatter plot with adversarial accuracy
+            scatter = ax4.scatter(train_stats['adv_acc_clean'], llc_interp, 
+                                alpha=0.6, c=train_stats['step'], cmap='viridis', s=30)
+            ax4.set_xlabel('Adversarial Accuracy (%)')
+            ax4.set_ylabel('LLC Mean')
+            ax4.set_title('Adversarial Accuracy vs LLC Correlation')
+            
+            # Add correlation coefficient
+            valid_mask = ~np.isnan(llc_interp)
+            if valid_mask.sum() > 1:
+                corr = np.corrcoef(train_stats['adv_acc_clean'][valid_mask], llc_interp[valid_mask])[0, 1]
+                ax4.text(0.05, 0.95, f'Correlation: {corr:.3f}', transform=ax4.transAxes, 
+                        bbox=dict(boxstyle="round", facecolor='wheat', alpha=0.8))
+        else:
+            # Create scatter plot with test loss
+            scatter = ax4.scatter(train_stats['test_loss_clean'], llc_interp, 
+                                alpha=0.6, c=train_stats['step'], cmap='viridis', s=30)
+            ax4.set_xlabel('Test Loss')
+            ax4.set_ylabel('LLC Mean')
+            ax4.set_title('Test Loss vs LLC Correlation')
+            
+            # Add correlation coefficient
+            valid_mask = ~np.isnan(llc_interp)
+            if valid_mask.sum() > 1:
+                corr = np.corrcoef(train_stats['test_loss_clean'][valid_mask], llc_interp[valid_mask])[0, 1]
+                ax4.text(0.05, 0.95, f'Correlation: {corr:.3f}', transform=ax4.transAxes, 
+                        bbox=dict(boxstyle="round", facecolor='wheat', alpha=0.8))
+        
+        plt.colorbar(scatter, ax=ax4, label='Training Step')
+        ax4.grid(True, alpha=0.3)
+    else:
+        ax4.text(0.5, 0.5, 'No LLC data available\nfor correlation analysis', 
+                transform=ax4.transAxes, ha='center', va='center', fontsize=12)
+        ax4.set_title('Test Loss vs LLC Correlation')
+    
+    plt.tight_layout()
+    
+    # Save the plot
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    suffix = ""
+    if log_scale:
+        suffix += "_log_scale"
+    if zoomed_in:
+        suffix += "_zoomed"
+    output_path = os.path.join(output_dir, f'loss_llc_comparison{suffix}_{timestamp}.png')
+    os.makedirs(output_dir, exist_ok=True)
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Loss vs LLC comparison plot saved to: {output_path}")
+    
+    # Print statistics
+    print("\n" + "="*60)
+    print("LOSS VS LLC COMPARISON STATISTICS")
+    print("="*60)
+    
+    print(f"Training data points: {len(train_stats)}")
+    print(f"LLC data points: {len(llc_success)}")
+    
+    if len(train_stats) > 0:
+        print(f"\nLoss ranges:")
+        print(f"  Train loss: {train_stats['train_loss_clean'].min():.4f} - {train_stats['train_loss_clean'].max():.4f}")
+        print(f"  Test loss: {train_stats['test_loss_clean'].min():.4f} - {train_stats['test_loss_clean'].max():.4f}")
+    
+    if len(llc_success) > 0:
+        print(f"\nLLC range: {llc_success['llc_mean'].min():.6f} - {llc_success['llc_mean'].max():.6f}")
+    
+    if grok_start:
+        print(f"\nGrokking detected at step: {grok_start}")
+        print(f"Grokking threshold: {grok_threshold}% test accuracy")
+    else:
+        print(f"\nNo grokking detected (threshold: {grok_threshold}% test accuracy)")
+    
+    return fig
+
+def main():
+    parser = argparse.ArgumentParser(description='Create paper-style comparison plots between Local Complexity and LLC metrics')
+    parser.add_argument('--train_stats', required=True, 
+                       help='Path to training statistics CSV file')
+    parser.add_argument('--llc_results', 
+                       help='Path to LLC results CSV file (for single LLC analysis)')
+    parser.add_argument('--llc_clean', 
+                       help='Path to clean LLC results CSV file (for clean vs adversarial comparison)')
+    parser.add_argument('--llc_adversarial', 
+                       help='Path to adversarial LLC results CSV file (for clean vs adversarial comparison)')
+    parser.add_argument('--output_dir', default='./plots',
+                       help='Output directory for plots (default: ./plots)')
+    parser.add_argument('--paper_style_only', action='store_true',
+                       help='Only create paper-style comparison (skip detailed analysis)')
+    parser.add_argument('--detailed_only', action='store_true',
+                       help='Only create detailed analysis (skip paper-style comparison)')
+    parser.add_argument('--clean_vs_adversarial', action='store_true',
+                       help='Create clean vs adversarial comparison (requires --llc_clean and --llc_adversarial)')
+    parser.add_argument('--loss_llc_comparison', action='store_true',
+                       help='Create loss vs LLC comparison (requires --llc_results)')
+    parser.add_argument('--zoomed_in', action='store_true',
+                       help='Zoom in on loss and LLC trajectories (0-10 range) for better detail visibility')
+    parser.add_argument('--log_scale', action='store_true',
+                       help='Use logarithmic y-axis scaling for loss plots to better visualize initial stage trends')
+    
+    args = parser.parse_args()
+    
+    # Validate input files
+    if not os.path.exists(args.train_stats):
+        print(f"❌ Training stats file not found: {args.train_stats}")
+        return
+    
+    # Validate based on analysis type
+    if args.clean_vs_adversarial:
+        # Clean vs adversarial comparison mode
+        if not args.llc_clean or not args.llc_adversarial:
+            print("❌ Clean vs adversarial comparison requires both --llc_clean and --llc_adversarial")
+            return
+        
+        if not os.path.exists(args.llc_clean):
+            print(f"❌ Clean LLC results file not found: {args.llc_clean}")
+            return
+            
+        if not os.path.exists(args.llc_adversarial):
+            print(f"❌ Adversarial LLC results file not found: {args.llc_adversarial}")
+            return
+        
+        print("Creating clean vs adversarial comparison...")
+        print("="*60)
+        print(f"Training stats: {args.train_stats}")
+        print(f"Clean LLC results: {args.llc_clean}")
+        print(f"Adversarial LLC results: {args.llc_adversarial}")
+        print(f"Output directory: {args.output_dir}")
+        print("="*60)
+        
+        fig = create_clean_vs_adversarial_comparison(args.train_stats, args.llc_clean, args.llc_adversarial, args.output_dir)
+        
+        print("\n" + "="*60)
+        print("ANALYSIS COMPLETE")
+        print("="*60)
+        print("Generated files in:", args.output_dir)
+        print("  - clean_vs_adversarial_comparison_[timestamp].png: Clean vs Adversarial comparison")
+        print("  (Timestamp format: YYYYMMDD_HHMMSS)")
+        print("="*60)
+        
+    elif args.loss_llc_comparison:
+        # Loss vs LLC comparison mode
+        if not args.llc_results:
+            print("❌ Loss vs LLC comparison requires --llc_results")
+            return
+            
+        if not os.path.exists(args.llc_results):
+            print(f"❌ LLC results file not found: {args.llc_results}")
+            return
+        
+        print("Creating loss vs LLC comparison...")
+        print("="*60)
+        print(f"Training stats: {args.train_stats}")
+        print(f"LLC results: {args.llc_results}")
+        print(f"Output directory: {args.output_dir}")
+        print("="*60)
+        
+        fig = create_loss_llc_comparison(args.train_stats, args.llc_results, args.output_dir, zoomed_in=args.zoomed_in, log_scale=args.log_scale)
+        
+        print("\n" + "="*60)
+        print("ANALYSIS COMPLETE")
+        print("="*60)
+        print("Generated files in:", args.output_dir)
+        print("  - loss_llc_comparison_[timestamp].png: Loss vs LLC comparison")
+        print("  (Timestamp format: YYYYMMDD_HHMMSS)")
+        print("="*60)
+        
+    else:
+        # Standard single LLC analysis mode
+        if not args.llc_results:
+            print("❌ Standard analysis requires --llc_results")
+            return
+            
+        if not os.path.exists(args.llc_results):
+            print(f"❌ LLC results file not found: {args.llc_results}")
+            return
+        
+        print("Creating comparison plots...")
+        print("="*60)
+        print(f"Training stats: {args.train_stats}")
+        print(f"LLC results: {args.llc_results}")
+        print(f"Output directory: {args.output_dir}")
+        print("="*60)
+        
+        # Create plots based on arguments
+        if not args.detailed_only:
+            print("\nCreating paper-style comparison...")
+            fig1 = create_paper_style_comparison(args.train_stats, args.llc_results, args.output_dir)
+        
+        if not args.paper_style_only:
+            print("\nCreating detailed analysis...")
+            fig2 = create_detailed_analysis(args.train_stats, args.llc_results, args.output_dir)
+        
+        print("\n" + "="*60)
+        print("ANALYSIS COMPLETE")
+        print("="*60)
+        print("Generated files in:", args.output_dir)
+        if not args.detailed_only:
+            print("  - paper_style_comparison_[timestamp].png: Main comparison in paper style")
+        if not args.paper_style_only:
+            print("  - detailed_analysis_[timestamp].png: Additional detailed analysis")
     print("  (Timestamp format: YYYYMMDD_HHMMSS)")
     print("="*60)
+
+if __name__ == '__main__':
+    main()

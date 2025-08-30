@@ -12,7 +12,7 @@ import json
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
@@ -25,6 +25,9 @@ from devinterp.slt.sampler import estimate_learning_coeff_with_summary
 from devinterp.utils import default_nbeta, evaluate_ce
 from devinterp.vis_utils import EpsilonBetaAnalyzer
 from devinterp.slt.mala import MalaAcceptanceRate
+
+# Import PGD attack for adversarial data generation
+from attacks import PGD
 
 
 def convert_to_serializable(obj):
@@ -195,6 +198,115 @@ class LLCCalibrator:
         
 
         return loss, {"logits": outputs}
+    
+    def _generate_adversarial_data(self, model: nn.Module, inputs: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """
+        Generate adversarial examples using PGD attack with the same parameters used during training.
+        
+        Args:
+            model: The model to attack
+            inputs: Clean input data
+            targets: True labels
+            
+        Returns:
+            Adversarial examples
+        """
+        # Use the same attack parameters as in training (from configs.py)
+        # Default values from config_resnet18_cifar10():
+        # config.atk_eps = 50/255, config.atk_alpha = 4/255, config.atk_itrs = 10
+        atk_eps = 50/255
+        atk_alpha = 4/255  
+        atk_itrs = 10
+        
+        # Get data bounds (from configs.py)
+        dmin = -2.4291  # precomputed data min for normalized CIFAR-10
+        dmax = 2.7537   # precomputed data max for normalized CIFAR-10
+        
+        # Ensure model is in eval mode for attack (but gradients enabled)
+        model.eval()
+        for param in model.parameters():
+            param.requires_grad_(True)
+        
+        # Ensure inputs are properly set up for gradient computation
+        inputs = inputs.detach().clone().requires_grad_(False)  # PGD will set requires_grad internally
+        targets = targets.detach().clone()
+        
+        # Create PGD attack instance
+        attack = PGD(
+            model=model,
+            eps=atk_eps,
+            alpha=atk_alpha,
+            steps=atk_itrs,
+            dmin=dmin,
+            dmax=dmax,
+            device=self.device
+        )
+        
+        # Generate adversarial examples (PGD needs gradients for attack computation)
+        adv_inputs = attack(inputs, targets)
+            
+        return adv_inputs
+    
+    def create_adversarial_dataloader(self, model: nn.Module, dataloader: DataLoader) -> DataLoader:
+        """
+        Create a new DataLoader with adversarial examples pre-generated from the original DataLoader
+        
+        Args:
+            model: The model to generate adversarial examples against
+            dataloader: Original clean DataLoader
+            
+        Returns:
+            New DataLoader with adversarial examples
+        """
+        print("🔥 Pre-generating adversarial examples...")
+        
+        # Set up model for adversarial generation
+        model.eval()
+        model = model.to(self.device)
+        
+        # CRITICAL: Ensure model parameters have gradients enabled for PGD attack
+        for param in model.parameters():
+            param.requires_grad_(True)
+        
+        print(f"  Model parameters requiring gradients: {sum(1 for p in model.parameters() if p.requires_grad)}")
+        print(f"  Model parameters NOT requiring gradients: {sum(1 for p in model.parameters() if not p.requires_grad)}")
+        
+        adversarial_data = []
+        total_batches = len(dataloader)
+        
+        for batch_idx, (inputs, targets) in enumerate(dataloader):
+            if batch_idx % max(1, total_batches // 10) == 0:
+                print(f"  Processing batch {batch_idx + 1}/{total_batches}")
+            
+            inputs, targets = inputs.to(self.device), targets.to(self.device)
+            
+            try:
+                # Generate adversarial examples for this batch
+                adv_inputs = self._generate_adversarial_data(model, inputs, targets)
+                
+                # Store adversarial examples (move to CPU to save GPU memory)
+                adversarial_data.append((adv_inputs.cpu(), targets.cpu()))
+                
+            except Exception as e:
+                print(f"  ⚠️  Error generating adversarial examples for batch {batch_idx + 1}: {e}")
+                # Fall back to clean data for this batch
+                adversarial_data.append((inputs.cpu(), targets.cpu()))
+        
+        print(f"✅ Generated adversarial examples for {len(adversarial_data)} batches")
+                
+        # Concatenate all batches
+        all_adv_inputs = torch.cat([batch[0] for batch in adversarial_data], dim=0)
+        all_targets = torch.cat([batch[1] for batch in adversarial_data], dim=0)
+        
+        adversarial_dataset = TensorDataset(all_adv_inputs, all_targets)
+        adversarial_dataloader = DataLoader(
+            adversarial_dataset, 
+            batch_size=dataloader.batch_size,
+            shuffle=False,  # Keep same order for consistency
+            num_workers=0  # Avoid multiprocessing issues with pre-generated data
+        )
+        
+        return adversarial_dataloader
     
     def calibrate_hyperparameters_multi_gamma(self,
                                          model: nn.Module,
@@ -777,6 +889,7 @@ class LLCCalibrator:
                     save_path: Optional[str] = None,
                     seed: Optional[int] = None,
                     retrospective_gamma: Optional[float] = None,
+                    use_adversarial_data: bool = False,
         ) -> Dict[str, Any]:
         """
         Estimate LLC for a single model.
@@ -790,6 +903,7 @@ class LLCCalibrator:
             retrospective_gamma: Optional override gamma for retrospective measurements
                                (allows using smaller gamma for meaningful LLC variation
                                 while keeping calibrated gamma for stability)
+            use_adversarial_data: If True, generate adversarial examples for LLC estimation
             
         Returns:
             Dictionary containing LLC estimates and diagnostics
@@ -873,12 +987,23 @@ class LLCCalibrator:
                 if i >= 5:  # Show only first 5
                     break
         
-        # Prepare data loader
-        llc_loader = DataLoader(
-            train_loader.dataset, 
-            batch_size=self.config.batch_size, 
-            shuffle=True
-        )
+        # Prepare data loader - either clean or adversarial
+        if use_adversarial_data:
+            print("🔥 Using adversarial data for LLC estimation")
+            # Create adversarial dataloader
+            clean_loader = DataLoader(
+                train_loader.dataset, 
+                batch_size=self.config.batch_size, 
+                shuffle=True
+            )
+            llc_loader = self.create_adversarial_dataloader(model, clean_loader)
+        else:
+            print("🧼 Using clean data for LLC estimation")
+            llc_loader = DataLoader(
+                train_loader.dataset, 
+                batch_size=self.config.batch_size, 
+                shuffle=True
+            )
         
         for name, param in model.named_parameters():
             if torch.isnan(param).any():

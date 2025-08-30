@@ -13,12 +13,12 @@ Usage:
 import torch
 import glob
 import os
+import json
 import numpy as np
 import pandas as pd
 from torch.utils.data import DataLoader
 import argparse
 from tqdm import tqdm
-import json
 from datetime import datetime
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -61,6 +61,10 @@ def main():
                        help='Skip checkpoints that already have results')
     parser.add_argument('--retrospective_gamma', type=float, default=None,
                        help='Override gamma for retrospective LLC measurements (allows smaller gamma for meaningful variation)')
+    parser.add_argument('--use_adversarial_data', action='store_true',
+                       help='Generate and use adversarial examples for LLC estimation instead of clean data')
+    parser.add_argument('--resume_from', type=str, default=None,
+                       help='Resume from intermediate results file (e.g., llc_nearest_neighbor_results_intermediate.json or .csv). Skips already processed checkpoints.')
     args = parser.parse_args()
     
     # Setup output directory
@@ -78,6 +82,14 @@ def main():
     if args.retrospective_gamma is not None:
         print(f"🎯 Retrospective gamma override: {args.retrospective_gamma}")
         print(f"   (Will use this instead of calibrated gamma for LLC measurements)")
+    if args.use_adversarial_data:
+        print(f"🔥 Adversarial data: ENABLED (will generate PGD adversarial examples)")
+        print(f"   Attack parameters: eps=50/255, alpha=4/255, steps=10")
+    else:
+        print(f"🧼 Adversarial data: DISABLED (using clean training data)")
+    if args.resume_from:
+        print(f"🔄 Resume mode: ENABLED")
+        print(f"   Resume file: {args.resume_from}")
     print("=" * 80)
     
     # Load parameter lookup table
@@ -113,7 +125,28 @@ def main():
     # Load existing results if available
     results_file = os.path.join(args.output_dir, 'llc_nearest_neighbor_results.csv')
     existing_results = {}
-    if os.path.exists(results_file) and args.skip_existing:
+    
+    # Handle resume functionality
+    if args.resume_from:
+        if not os.path.exists(args.resume_from):
+            print(f"❌ Resume file not found: {args.resume_from}")
+            return
+        
+        print(f"🔄 Resuming from: {args.resume_from}")
+        if args.resume_from.endswith('.json'):
+            with open(args.resume_from, 'r') as f:
+                resume_data = json.load(f)
+            # Convert to DataFrame-like format
+            existing_results = {int(item['step']): item for item in resume_data}
+        elif args.resume_from.endswith('.csv'):
+            existing_df = pd.read_csv(args.resume_from)
+            existing_results = {int(row['step']): row for _, row in existing_df.iterrows()}
+        else:
+            print(f"❌ Unsupported resume file format. Use .json or .csv")
+            return
+        print(f"📊 Resuming with {len(existing_results)} existing results")
+        
+    elif os.path.exists(results_file) and args.skip_existing:
         existing_df = pd.read_csv(results_file)
         existing_results = {int(row['step']): row for _, row in existing_df.iterrows()}
         print(f"Found {len(existing_results)} existing results")
@@ -187,7 +220,8 @@ def main():
                 train_loader,  # Use full train_loader for consistency
                 hyperparams=nearest_params,
                 seed=42,  # Fixed seed for reproducibility
-                retrospective_gamma=args.retrospective_gamma  # Override gamma for retrospective measurement
+                retrospective_gamma=args.retrospective_gamma,  # Override gamma for retrospective measurement
+                use_adversarial_data=args.use_adversarial_data  # Use adversarial data if requested
             )
             
             # Extract results
@@ -223,8 +257,8 @@ def main():
             else:
                 print(f"Step {step}: LLC = {llc_mean:.4f} ± {llc_std:.4f} (params from step {nearest_step})")
             
-            # Save intermediate results every 20 checkpoints
-            if len(results) % 20 == 0:
+            # Save intermediate results every 5 checkpoints (more frequent to prevent loss on OOM)
+            if len(results) % 5 == 0:
                 save_results(results, args.output_dir, intermediate=True)
         
         except Exception as e:

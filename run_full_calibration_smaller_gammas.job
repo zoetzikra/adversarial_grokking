@@ -36,12 +36,10 @@ CHECKPOINT_DIR="/home/ztzifa/grok-adversarial/models/Fri_Jul_18_17:04:54_2025"
 
 python llc_hybrid_calibration.py \
     --checkpoint_dir "$CHECKPOINT_DIR" \
-    --output_dir "./llc_full_calibration_results" \
+    --output_dir "./llc_full_calibration_results_fixed_gamma_1_beta_default" \
     --device cuda \
     --gamma_values 1.0 \
-    --selection_method mala \
-    --use_tuned_beta True
-
+    --selection_method mala 
 
 # python llc_hybrid_calibration.py \
 #     --checkpoint_dir "$CHECKPOINT_DIR" \
