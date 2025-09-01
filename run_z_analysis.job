@@ -3,7 +3,7 @@
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=8
 #SBATCH --job-name=adversarial_grokking_ffcv
-#SBATCH --output=RunMethod_%A_h100_analysis.out
+#SBATCH --output=RunMethod_%A_h100_analysis_symlog.out
 #SBATCH --time=12:00:00
 #SBATCH --mem=40G
 #SBATCH --hint=nomultithread
@@ -26,19 +26,45 @@ source activate devinterp_env
 #     --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv \
 #     --output_dir /home/ztzifa/grok-adversarial
 
+# python create_paper_style_comparison.py \
+#     --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+#     --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv \
+#     --loss_llc_comparison \
+#     --output_dir /home/ztzifa/grok-adversarial \
+#     --zoomed_in
+
+# python create_paper_style_comparison.py \
+#     --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+#     --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results_adversarial/llc_nearest_neighbor_results.csv \
+#     --loss_llc_comparison \
+#     --output_dir /home/ztzifa/grok-adversarial
+
+
 python create_paper_style_comparison.py \
     --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
     --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv \
+    --output_dir /home/ztzifa/grok-adversarial/final_comparisons \
+    --loss_llc_comparison 
+    
+python create_paper_style_comparison.py \
+    --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+    --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results_adversarial/llc_nearest_neighbor_results.csv \
+    --output_dir /home/ztzifa/grok-adversarial/final_comparisons \
+    --loss_llc_comparison 
+
+python create_paper_style_comparison.py \
+    --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
+    --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results/llc_nearest_neighbor_results.csv \
+    --output_dir /home/ztzifa/grok-adversarial/final_comparisons \
     --loss_llc_comparison \
-    --output_dir /home/ztzifa/grok-adversarial \
-    --zoomed_in
+    --log_scale
 
 python create_paper_style_comparison.py \
     --train_stats /home/ztzifa/grok-adversarial/analysis_output/training_stats.csv \
     --llc_results /home/ztzifa/grok-adversarial/llc_full_calibration_results_fixed_gamma_1/retrospective_results_adversarial/llc_nearest_neighbor_results.csv \
+    --output_dir /home/ztzifa/grok-adversarial/final_comparisons \
     --loss_llc_comparison \
-    --output_dir /home/ztzifa/grok-adversarial
-
+    --log_scale
 
 
 # python create_paper_style_comparison.py \

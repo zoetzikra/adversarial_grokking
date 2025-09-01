@@ -520,34 +520,27 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
         print(f"LLC step range: {llc_success['step'].min()} - {llc_success['step'].max()}")
         print(f"LLC mean range: {llc_success['llc_mean'].min():.4f} - {llc_success['llc_mean'].max():.4f}")
     
-    # Detect grokking phase (same logic as in detailed_analysis)
-    grok_threshold = 70  # Define grokking as >70% test accuracy
-    grok_mask = train_stats['test_acc_clean'] > grok_threshold
-    grok_start = train_stats[grok_mask]['step'].min() if grok_mask.any() else None
+    # Use grokking definition from original paper: starts around 10^4 optimization steps
+    grok_start = 10000  # 10^4 as defined in the original grokking paper
     
     # Create figure with 2x2 subplots
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 10))
     
-    # Set styling
+    # Set styling with larger fonts
     plt.rcParams.update({
-        'font.size': 12,
+        'font.size': 14,
         'axes.linewidth': 1,
-        'axes.labelsize': 12,
-        'xtick.labelsize': 10,
-        'ytick.labelsize': 10,
-        'legend.fontsize': 10,
+        'axes.labelsize': 16,
+        'xtick.labelsize': 12,
+        'ytick.labelsize': 12,
+        'legend.fontsize': 12,
         'figure.dpi': 100
     })
     
     # Plot 1: Loss/Accuracy Evolution (top left)
-    if log_scale:
-        # Use loglog for both x and y axes when log_scale=True
-        ax1.loglog(train_stats['step'], train_stats['train_loss_clean'], 
-                   '-', color='#1f77b4', linewidth=2, label='Train Loss')
-    else:
-        # Use semilogx (log x-axis, linear y-axis) as before
-        ax1.semilogx(train_stats['step'], train_stats['train_loss_clean'], 
-                     '-', color='#1f77b4', linewidth=2, label='Train Loss')
+    # Always use semilogx for x-axis, y-axis scaling is handled separately
+    ax1.semilogx(train_stats['step'], train_stats['train_loss_clean'], 
+                 '-', color='#1f77b4', linewidth=2, label='Train Loss')
     
     if is_adversarial and 'adv_acc_clean' in train_stats.columns:
         # Create dual y-axis for adversarial accuracy
@@ -560,44 +553,40 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
         else:
             ax1_twin.semilogx(train_stats['step'], train_stats['adv_acc_clean'], 
                              '-', color='#ff7f0e', linewidth=2, label='Adversarial Accuracy')
-        ax1.set_ylabel('Train Loss', color='#1f77b4')
-        ax1_twin.set_ylabel('Adversarial Accuracy (%)', color='#ff7f0e')
-        ax1.set_title('Train Loss vs Adversarial Robustness' + (' (Log Scale)' if log_scale else ''))
+        ax1.set_ylabel('Train Loss', color='#1f77b4', fontsize=15)
+        ax1_twin.set_ylabel('Adversarial Accuracy (%)', color='#ff7f0e', fontsize=15)
+        ax1.set_title('Train Loss vs Adversarial Robustness' + (' (Symlog Scale)' if log_scale else ''), fontsize=14)
         
         # Set y-axis limits
         if log_scale:
-            # For log scale, ensure we don't include zero or negative values
-            min_loss = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0].min()
+            # Use symlog scale for hybrid behavior: linear near zero, log for large values
+            ax1.set_yscale('symlog', linthresh=1.0)
             max_loss = train_stats['train_loss_clean'].max()
-            ax1.set_ylim(min_loss * 0.5, max_loss * 2)
+            ax1.set_ylim(-0.2, max_loss * 1.1)
         else:
             ax1.set_ylim(0, train_stats['train_loss_clean'].max() * 1.1)
         ax1_twin.set_ylim(0, 100)
         
-        # Combine legends
-        lines1, labels1 = ax1.get_legend_handles_labels()
-        lines2, labels2 = ax1_twin.get_legend_handles_labels()
-        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+        # Don't create legend yet - wait for grokking indicator
+        pass
     else:
         # Standard test loss plot
-        if log_scale:
-            ax1.loglog(train_stats['step'], train_stats['test_loss_clean'], 
-                       '-', color='#ff7f0e', linewidth=2, label='Test Loss')
-        else:
-            ax1.semilogx(train_stats['step'], train_stats['test_loss_clean'], 
-                         '-', color='#ff7f0e', linewidth=2, label='Test Loss')
-        ax1.set_ylabel('Loss')
-        ax1.set_title('Train vs Test Loss Evolution' + (' (Log Scale)' if log_scale else ''))
-        ax1.legend(loc='upper right')
+        ax1.semilogx(train_stats['step'], train_stats['test_loss_clean'], 
+                     '-', color='#ff7f0e', linewidth=2, label='Test Loss')
+        ax1.set_ylabel('Loss', fontsize=15)
+        ax1.set_title('Train vs Test Loss Evolution' + (' (Symlog Scale)' if log_scale else ''), fontsize=14)
+        # Don't create legend yet - wait for grokking indicator
         # Set y-axis to show the actual range of loss values
         if log_scale:
-            # For log scale, ensure we don't include zero or negative values
-            train_loss_pos = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0]
-            test_loss_pos = train_stats['test_loss_clean'][train_stats['test_loss_clean'] > 0]
-            min_loss = min(train_loss_pos.min(), test_loss_pos.min()) if len(train_loss_pos) > 0 and len(test_loss_pos) > 0 else 1e-6
+            # Use symlog scale for hybrid behavior: linear near zero, log for large values
             max_loss = max(train_stats['train_loss_clean'].max(), train_stats['test_loss_clean'].max())
-            ax1.set_ylim(min_loss * 0.5, max_loss * 2)
-            print(f"Setting log scale y-axis limit to: {min_loss * 0.5:.6f} - {max_loss * 2:.4f}")
+            # Use reasonable linthresh for better scaling
+            linthresh = 1.0  # Linear behavior for values 0-1, then logarithmic above
+            ax1.set_yscale('symlog', linthresh=linthresh)  # Remove linscale parameter
+            # Set limits to ensure the peak is fully visible with significant headroom
+            upper_limit = max_loss * 1.5  # Give 50% more space above the peak
+            ax1.set_ylim(0, upper_limit)  # Start from 0
+            print(f"Setting symlog scale with linthresh={linthresh:.3f}, y-axis limit: 0 - {upper_limit:.4f} (max_loss: {max_loss:.4f})")
         elif zoomed_in:
             # Zoomed in view: focus on 0-10 range for better detail
             ax1.set_ylim(-0.2, 10)
@@ -609,15 +598,24 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
             ax1.set_ylim(min_y, max_loss * 1.1)
             print(f"Setting y-axis limit to: {min_y:.4f} - {max_loss * 1.1:.4f}")
     
-    ax1.set_xlabel('Optimization Steps')
+    ax1.set_xlabel('Optimization Steps', fontsize=15)
     ax1.grid(True, alpha=0.3)
     ax1.set_xlim(1e0, 5e5)
     
-    # Add grokking indicator
+    # Add grokking indicator and create final legend
     if grok_start:
         ax1.axvline(grok_start, color='green', linestyle='--', alpha=0.7, 
                    label=f'Grokking starts (~{grok_start})')
-        ax1.legend(loc='upper right')
+    
+    # Create legend after all elements are added
+    if is_adversarial and 'adv_acc_clean' in train_stats.columns:
+        # For adversarial case, combine legends from both axes
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax1_twin.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='center left')
+    else:
+        # For standard case, just use ax1 legend
+        ax1.legend(loc='upper left')
     
     # Plot 2: LLC Evolution (top right)
     if len(llc_success) > 0:
@@ -634,10 +632,10 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
                                valid_std['llc_mean'] + valid_std['llc_std'],
                                alpha=0.2, color='#2ca02c')
     
-    ax2.set_xlabel('Optimization Steps')
-    ax2.set_ylabel('Local Learning Coefficient')
-    ax2.set_title('LLC Evolution')
-    ax2.legend(loc='upper right')
+    ax2.set_xlabel('Optimization Steps', fontsize=15)
+    ax2.set_ylabel('Local Learning Coefficient', fontsize=15)
+    ax2.set_title('LLC Evolution', fontsize=14)
+    ax2.legend(loc='upper left')
     ax2.grid(True, alpha=0.3)
     ax2.set_xlim(1e0, 5e5)
     
@@ -645,35 +643,35 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
     if grok_start:
         ax2.axvline(grok_start, color='green', linestyle='--', alpha=0.7, 
                    label=f'Grokking starts (~{grok_start})')
-        ax2.legend(loc='upper right')
+        ax2.legend(loc='upper left')
     
     # Plot 3: Combined Loss and LLC (bottom left)
     # Use dual y-axis to show both loss and LLC
     ax3_twin = ax3.twinx()
     
     # Plot train loss and test loss/adversarial accuracy on left y-axis
-    if log_scale:
-        line1 = ax3.loglog(train_stats['step'], train_stats['train_loss_clean'], 
-                          '-', color='#1f77b4', linewidth=2, label='Train Loss')
-    else:
-        line1 = ax3.semilogx(train_stats['step'], train_stats['train_loss_clean'], 
-                            '-', color='#1f77b4', linewidth=2, label='Train Loss')
+    line1 = ax3.semilogx(train_stats['step'], train_stats['train_loss_clean'], 
+                        '-', color='#1f77b4', linewidth=2, label='Train Loss')
     
     if is_adversarial and 'adv_acc_clean' in train_stats.columns:
         # For adversarial results, plot adversarial accuracy instead of test loss
         # Adversarial accuracy can't use log y-axis since it includes 0-100%
         line2 = ax3.semilogx(train_stats['step'], train_stats['adv_acc_clean'], 
                             '-', color='#ff7f0e', linewidth=2, label='Adversarial Accuracy')
-        ax3.set_ylabel('Train Loss / Adversarial Accuracy (%)', color='black')
-        title_suffix = ' (Log Scale)' if log_scale else ''
-        ax3.set_title('Train Loss, Adversarial Accuracy and LLC' + title_suffix)
+        ax3.set_ylabel('Train Loss / Adversarial Accuracy (%)', color='black', fontsize=15)
+        title_suffix = ' (Symlog Scale)' if log_scale else ''
+        ax3.set_title('Train Loss, Adversarial Accuracy and LLC' + title_suffix, fontsize=14)
         # Set y-axis to accommodate both loss and accuracy (0-100%)
         if log_scale:
-            # For log scale, set train loss axis appropriately
-            min_loss = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0].min()
+            # Use symlog scale for hybrid behavior in combined plot
             max_loss = train_stats['train_loss_clean'].max()
-            ax3.set_ylim(min_loss * 0.5, max(max_loss * 2, 100))
-            print(f"Setting combined plot log scale y-axis limit to: {min_loss * 0.5:.6f} - {max(max_loss * 2, 100):.4f} (adversarial mode)")
+            # Use reasonable linthresh for better scaling
+            linthresh = 1.0  # Linear behavior for values 0-1, then logarithmic above
+            ax3.set_yscale('symlog', linthresh=linthresh)  # Remove linscale parameter
+            # Set limits to ensure the peak is fully visible with significant headroom
+            upper_limit = max(max_loss * 1.5, 100)  # Give 50% more space above the peak, at least 100 for accuracy
+            ax3.set_ylim(0, upper_limit)  # Start from 0
+            print(f"Setting combined plot symlog scale with linthresh={linthresh:.3f}, y-axis limit: 0 - {upper_limit:.4f} (adversarial mode, max_loss: {max_loss:.4f})")
         elif zoomed_in:
             ax3.set_ylim(0, 10)
             print(f"Setting combined plot zoomed y-axis limit to: 0 - 10 (adversarial mode)")
@@ -682,24 +680,22 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
             ax3.set_ylim(0, max(max_loss, 100))
     else:
         # Standard test loss plot
-        if log_scale:
-            line2 = ax3.loglog(train_stats['step'], train_stats['test_loss_clean'], 
-                              '-', color='#ff7f0e', linewidth=2, label='Test Loss')
-        else:
-            line2 = ax3.semilogx(train_stats['step'], train_stats['test_loss_clean'], 
-                                '-', color='#ff7f0e', linewidth=2, label='Test Loss')
-        ax3.set_ylabel('Loss', color='black')
-        title_suffix = ' (Log Scale)' if log_scale else ''
-        ax3.set_title('Loss and LLC Combined' + title_suffix)
+        line2 = ax3.semilogx(train_stats['step'], train_stats['test_loss_clean'], 
+                            '-', color='#ff7f0e', linewidth=2, label='Test Loss')
+        ax3.set_ylabel('Loss', color='black', fontsize=15)
+        title_suffix = ' (Symlog Scale)' if log_scale else ''
+        ax3.set_title('Loss and LLC Combined' + title_suffix, fontsize=14)
         # Set y-axis to show the actual range of loss values
         if log_scale:
-            # For log scale, ensure we don't include zero or negative values
-            train_loss_pos = train_stats['train_loss_clean'][train_stats['train_loss_clean'] > 0]
-            test_loss_pos = train_stats['test_loss_clean'][train_stats['test_loss_clean'] > 0]
-            min_loss = min(train_loss_pos.min(), test_loss_pos.min()) if len(train_loss_pos) > 0 and len(test_loss_pos) > 0 else 1e-6
+            # Use symlog scale for hybrid behavior in combined plot
             max_loss = max(train_stats['train_loss_clean'].max(), train_stats['test_loss_clean'].max())
-            ax3.set_ylim(min_loss * 0.5, max_loss * 2)
-            print(f"Setting combined plot log scale y-axis limit to: {min_loss * 0.5:.6f} - {max_loss * 2:.4f}")
+            # Use reasonable linthresh for better scaling
+            linthresh = 1.0  # Linear behavior for values 0-1, then logarithmic above
+            ax3.set_yscale('symlog', linthresh=linthresh)  # Remove linscale parameter
+            # Set limits to ensure the peak is fully visible with significant headroom
+            upper_limit = max_loss * 1.5  # Give 50% more space above the peak
+            ax3.set_ylim(0, upper_limit)  # Start from 0
+            print(f"Setting combined plot symlog scale with linthresh={linthresh:.3f}, y-axis limit: 0 - {upper_limit:.4f} (max_loss: {max_loss:.4f})")
         elif zoomed_in:
             ax3.set_ylim(0, 10)
             print(f"Setting combined plot zoomed y-axis limit to: 0 - 10")
@@ -714,8 +710,8 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
                                  'o-', color='#2ca02c', linewidth=2, markersize=3, 
                                  label='LLC', alpha=0.8)
     
-    ax3.set_xlabel('Optimization Steps')
-    ax3_twin.set_ylabel('Local Learning Coefficient', color='#2ca02c')
+    ax3.set_xlabel('Optimization Steps', fontsize=15)
+    ax3_twin.set_ylabel('Local Learning Coefficient', color='#2ca02c', fontsize=15)
     ax3.grid(True, alpha=0.3)
     ax3.set_xlim(1e0, 5e5)  # Cut off x-axis at 10^4
     
@@ -769,7 +765,9 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
                    label=f'Grokking starts (~{grok_start})')
         labels.append(f'Grokking starts (~{grok_start})')
     
-    ax3.legend(lines, labels, loc='upper right')
+    # Position legend based on whether it's adversarial data
+    legend_loc = 'center left' if is_adversarial and 'adv_acc_clean' in train_stats.columns else 'upper left'
+    ax3.legend(lines, labels, loc=legend_loc)
     
     # Final enforcement of axis limits (in case matplotlib adjusted them)
     if zoomed_in and len(llc_success) > 0:
@@ -803,9 +801,9 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
             # Create scatter plot with test loss
             scatter = ax4.scatter(train_stats['test_loss_clean'], llc_interp, 
                                 alpha=0.6, c=train_stats['step'], cmap='viridis', s=30)
-            ax4.set_xlabel('Test Loss')
-            ax4.set_ylabel('LLC Mean')
-            ax4.set_title('Test Loss vs LLC Correlation')
+            ax4.set_xlabel('Test Loss', fontsize=15)
+            ax4.set_ylabel('LLC Mean', fontsize=15)
+            ax4.set_title('Test Loss vs LLC Correlation', fontsize=14)
             
             # Add correlation coefficient
             valid_mask = ~np.isnan(llc_interp)
@@ -827,7 +825,7 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     suffix = ""
     if log_scale:
-        suffix += "_log_scale"
+        suffix += "_symlog_scale"
     if zoomed_in:
         suffix += "_zoomed"
     output_path = os.path.join(output_dir, f'loss_llc_comparison{suffix}_{timestamp}.png')
@@ -851,11 +849,7 @@ def create_loss_llc_comparison(train_stats_path, llc_results_path, output_dir, z
     if len(llc_success) > 0:
         print(f"\nLLC range: {llc_success['llc_mean'].min():.6f} - {llc_success['llc_mean'].max():.6f}")
     
-    if grok_start:
-        print(f"\nGrokking detected at step: {grok_start}")
-        print(f"Grokking threshold: {grok_threshold}% test accuracy")
-    else:
-        print(f"\nNo grokking detected (threshold: {grok_threshold}% test accuracy)")
+    print(f"\nGrokking starts at step: {grok_start} (as defined in original paper: 10^4)")
     
     return fig
 
